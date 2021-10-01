@@ -1,0 +1,6 @@
+# Emacs backup files
+*~
+
+# Build artifacts
+program
+lib_function.so
