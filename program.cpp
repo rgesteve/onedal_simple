@@ -35,7 +35,9 @@ int main(int argc, char* argv[])
                                               7.3f, 7.4f, 7.5f, 7.6f, 7.7f, 7.8f, 7.9f, 3,    8.0f, 8.1f, 8.2f, 8.3f, 8.4f, 8.5f, 8.6f, 8.7f,
                                               8.8f, 8.9f, 4,    9.0f, 9.1f, 9.2f, 9.3f, 9.4f, 9.5f, 9.6f, 9.7f, 9.8f, 9.9f, 5 };
 
-    createTable(data, nFeatures, nObservations);
+    int res = createTable(data, nFeatures, nObservations);
+
+    cout << "The result coming back is [" << res << "]" << endl;
     
 #endif
 

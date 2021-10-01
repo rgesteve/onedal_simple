@@ -15,6 +15,6 @@
 #define ONEDAL_C_EXPORT ONEDAL_EXTERN_C
 #endif
 
-ONEDAL_C_EXPORT void createTable(float* const data, size_t numFeatures, size_t numObservations);
+ONEDAL_C_EXPORT int createTable(float* data, int numFeatures, int numObservations);
 
 #endif
