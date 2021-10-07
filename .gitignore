@@ -6,3 +6,4 @@ program
 lib_function.so
 obj/
 bin/
+build/
