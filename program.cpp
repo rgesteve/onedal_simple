@@ -1,7 +1,19 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "function.h"
+#define ONEDAL_THROUGH_LIB 0
+
+#if ONEDAL_THROUGH_LIB
+#  include "function.h"
+#else
+#  include <daal.h>
+
+using namespace std;
+
+using namespace daal;
+using namespace daal::algorithms;
+using namespace daal::data_management;
+#endif
 
 using namespace std;
 
@@ -9,14 +21,19 @@ const size_t nFeatures         = 3;
 
 int main(int argc, char* argv[])
 {
-#if 0
+        cout << "Starting process" << endl;
+
+#if !ONEDAL_THROUGH_LIB
+        cout << "Creating table" << endl;
     /*
     NumericTablePtr data(new HomogenNumericTable<>(nFeatures, 0, NumericTable::doNotAllocate));
     NumericTablePtr dependentVariables(new HomogenNumericTable<>(1, 0, NumericTable::doNotAllocate));
     */
+    /*
     HomogenNumericTable<double> table(nFeatures, 0, NumericTable::doAllocate, 0.0);
     double data[nFeatures] = {1,2,3};
     table.setArray(data);
+    */
 #else
     const size_t nObservations = 10;
     const size_t nFeatures     = 11;

@@ -5,12 +5,15 @@ project(OneDALNative)
 set(USE_DPCPP no)
 find_package(oneDAL CONFIG REQUIRED)
 
+message(STATUS "*** The output directory is: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ****")
+
 include_directories(${oneDAL_INCLUDE_DIRS})
 link_libraries(${oneDAL_IMPORTED_TARGETS})
 
-add_library(OneDALNative_lib SHARED function.cpp)
+#add_library(OneDALNative_lib SHARED function.cpp)
 add_executable(OneDALNative program.cpp)
-target_link_libraries(OneDALNative PUBLIC OneDALNative_lib ${oneDAL_IMPORTED_TARGETS})
+#target_link_libraries(OneDALNative PUBLIC OneDALNative_lib ${oneDAL_IMPORTED_TARGETS})
+target_link_libraries(OneDALNative PUBLIC ${oneDAL_IMPORTED_TARGETS})
 
 # target_include_directories(OneDALNative PRIVATE ${oneDAL_INCLUDE_DIRS})
 # if (UNIX)
