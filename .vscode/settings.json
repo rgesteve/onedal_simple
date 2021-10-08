@@ -1,0 +1,20 @@
+{
+    "files.exclude" : {
+        "bin" : true,
+        "obj" : true,
+        "build" : true
+    },
+    "search.exclude" : {
+        "bin" : true,
+        "obj" : true,
+        "build" : true
+    },
+    "files.associations" : {
+        "Dockerfile*" : "dockerfile"
+    },
+    /*
+    "dotnet-test-explorer.testProjectPath": "src/simpledsl.xunit/simpledsl.xunit.csproj",
+    "dotnet-test-explorer.autoExpandTree": true,
+    "dotnet-test-explorer.enableTelemetry": false
+    */
+}
