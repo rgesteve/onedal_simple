@@ -43,6 +43,36 @@ namespace CSTestLib
       return;
     }
 
+    public static void LinRegTrain(int featureCount, int rowCount)
+    {
+      int m = featureCount + 1;
+      var betasArray = new float[m];
+      /*
+      List<float> labelsList = new List<float>();
+      List<float> featuresList = new List<float>();
+      */
+
+      List<float> labelsList = Enumerable.Range(0, rowCount).Select(x => (float)x).ToList();
+      List<float> featuresList = Enumerable.Range(0, rowCount).Select(x => (float)x).ToList();
+
+      float[] labels = labelsList.ToArray();
+      float[] features = featuresList.ToArray();
+
+      unsafe {
+        fixed (void* featuresPtr = &features[0], labelsPtr = &labels[0], betasPtr = &betasArray[0]) {
+                    Native.LinearRegressionSingle(featuresPtr, labelsPtr, betasPtr, rowCount, m - 1);
+        }
+      }
+
+      float bias = betasArray[0];
+      var weights = new float[m - 1];
+      for (int i = 1; i < m; ++i) {
+        weights[i - 1] = betasArray[i];
+      }
+      // can we turn this into a Span?
+      //var weightsBuffer = new VBuffer<float>(m - 1, weights);
+    }
+
 #if _WINDOWS
     const string libDirPath = @"C:\Users\rgesteve\Documents\projects\onedal_simple\build";
     const string libPath = libDirPath + @"\Debug\OneDALNative_lib.dll";
@@ -55,6 +85,9 @@ namespace CSTestLib
     {
       [DllImport(libPath, EntryPoint="createTable")]
       public unsafe static extern int createTable(float* data, int numFeatures, int numObservations);
+
+      [DllImport(libPath, EntryPoint = "linearRegressionSingle")]
+      public unsafe static extern void LinearRegressionSingle(void* features, void* labels, void* betas, int nRows, int nColumns);
     }
   }
 }
