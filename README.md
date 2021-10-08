@@ -26,3 +26,8 @@ To run the program, you need to first add the OneAPI installation directory to t
 ```powershell
 > $env:PATH = $env:PATH + ";C:\Program Files (x86)\Intel\oneAPI\dal\2021.4.0\redist\intel64"
 ```
+
+You can use the provided script "build.ps1", in which case, please call it from a Visual Studio prompt (as it will have CMake available):
+```cmd
+%ProgramFiles(x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\Launch-VsDevShell.ps1
+```
