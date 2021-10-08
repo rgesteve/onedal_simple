@@ -24,7 +24,8 @@ namespace CSTestLib
       if (Directory.Exists(libDirPath)) {
         Console.WriteLine("The path is there, should be OK");
       } else {
-        Console.WriteLine("Can't find the path, there is a problem");
+        Console.WriteLine("Can't find the path, there is a problem, bailing");
+        return;
       }
 
       Console.WriteLine($"Trying to call the external library.");
@@ -39,10 +40,16 @@ namespace CSTestLib
       Console.WriteLine($"The list contains [{labelsList.Count}] elements.");
       Console.WriteLine($"The result of calling the native function is [{result}].");
       Console.WriteLine($"Done!!");
+      return;
     }
 
+#if _WINDOWS
+    const string libDirPath = @"C:\Users\rgesteve\Documents\projects\onedal_simple\build";
+    const string libPath = libDirPath + @"\Debug\OneDALNative_lib.dll";
+#else
     const string libDirPath = @"/data/Documents/Snippets/onedal/first/build";
     const string libPath = libDirPath + "/libOneDALNative_lib.so";
+#endif
 
     internal static class Native
     {
