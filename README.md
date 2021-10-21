@@ -31,3 +31,7 @@ You can use the provided script "build.ps1", in which case, please call it from 
 ```cmd
 %ProgramFiles(x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\Launch-VsDevShell.ps1
 ```
+
+## OneDALStandalone
+
+This is meant to be a "playground" to try out OneDAL algorithms in C++, to understand/verify their behavior.
