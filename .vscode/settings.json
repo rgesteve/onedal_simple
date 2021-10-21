@@ -2,12 +2,12 @@
     "files.exclude" : {
         "**/*/bin" : true,
         "**/*/obj" : true,
-        "build" : true
+        "**/build/" : true
     },
     "search.exclude" : {
         "**/*/bin" : true,
         "**/*/obj" : true,
-        "build" : true
+        "**/build/" : true
     },
     "files.associations" : {
         "Dockerfile*" : "dockerfile"
