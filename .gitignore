@@ -7,3 +7,5 @@ lib_function.so
 obj/
 bin/
 build/
+output.txt
+

@@ -33,6 +33,7 @@ inline void printArray(T* array, const size_t nPrintedCols, const size_t nPrinte
         for (size_t j = 0; j < nPrintedCols; j++) {
             std::cout << std::setw(interval) << std::setiosflags(std::ios::fixed) << std::setprecision(3);
             std::cout << array[i * nCols + j];
+            std::cout << " "; // FIXME -- this should not be needed
         }
         std::cout << std::endl;
     }
@@ -74,19 +75,26 @@ int main(int argc, char* argv[])
     NumericTablePtr featuresTable(new HomogenNumericTable<int>(data.data(), nFeatures, nObservations));
     printNumericTable(featuresTable);
 
+    // examples\daal\cpp\source\linear_regression\lin_reg_qr_dense_batch.cpp
     cout << "Reading tables from CSV: \n";
     const path& datasetFilename = path(DATA_FILES_DIR) / "linear_regression_train.csv";
     if (!exists(datasetFilename)) {
         cout << "Cannot find actual dataset file" << endl;
         return EXIT_FAILURE;
     }
-
+    const size_t nFeatures           = 10; /* Number of features in training and testing data sets */
+    const size_t nDependentVariables = 2;  /* Number of dependent variables that correspond to each observation */
     FileDataSource<CSVFeatureManager> dataSource(datasetFilename.lexically_normal().string(), DataSource::notAllocateNumericTable, DataSource::doDictionaryFromContext);
-#if 0
-    NumericTablePtr data(new HomogenNumericTable<>(10, 0, NumericTable::doNotAllocate));
+    NumericTablePtr dataFeatures(new HomogenNumericTable<>(nFeatures, 0, NumericTable::doNotAllocate));
     NumericTablePtr dependentVariables(new HomogenNumericTable<>(1, 0, NumericTable::doNotAllocate));
-    NumericTablePtr mergedData(new MergedNumericTable(data, dependentVariables));
-#endif
+    NumericTablePtr mergedData(new MergedNumericTable(dataFeatures, dependentVariables));
+    printNumericTable(mergedData);
+
+    cout << "Loading read data into numeric table: \n";
+    /* Retrieve the data from input file */
+    dataSource.loadDataBlock(mergedData.get());
+    //printNumericTable(mergedData);
+    printNumericTable(dataFeatures);
 
     cout << "Done!" << endl;
 
