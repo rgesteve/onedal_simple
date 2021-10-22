@@ -5,13 +5,18 @@
 #include <numeric>
 #include <algorithm>
 #include <iterator>
+#include <filesystem>
 
 #include "daal.h"
 #if 0
 #include "data_management/data/internal/finiteness_checker.h"
 #endif
 
+#include "config.h"
+
 using namespace std;
+using namespace std::filesystem;
+
 using namespace daal;
 using namespace daal::data_management;
 using namespace daal::algorithms::linear_regression;
@@ -48,6 +53,14 @@ int main(int argc, char* argv[])
                                               7.3f, 7.4f, 7.5f, 7.6f, 7.7f, 7.8f, 7.9f, 3,    8.0f, 8.1f, 8.2f, 8.3f, 8.4f, 8.5f, 8.6f, 8.7f,
                                               8.8f, 8.9f, 4,    9.0f, 9.1f, 9.2f, 9.3f, 9.4f, 9.5f, 9.6f, 9.7f, 9.8f, 9.9f, 5 };
 #endif
+
+    cout << "Looking for data files at: " DATA_FILES_DIR << "." << endl;
+    if (! exists(DATA_FILES_DIR)) {
+        cout << "Expected data files path (" DATA_FILES_DIR << ") doestn't seem to exist" << endl;
+        return EXIT_FAILURE;
+    } else {
+        cout << "Looks like data files are where expected." << endl;
+    }
 
     std::vector<int> data(nFeatures * nObservations); 
 
