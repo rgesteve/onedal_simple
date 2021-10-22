@@ -5,21 +5,21 @@
 #include <numeric>
 #include <algorithm>
 #include <iterator>
-#include <cstdio>
+#include <filesystem>
 
 #include "daal.h"
 #if 0
 #include "data_management/data/internal/finiteness_checker.h"
 #endif
 
-// #include "config.h"
+#include "config.h"
 
 using namespace std;
+using namespace std::filesystem;
+
 using namespace daal;
 using namespace daal::data_management;
 using namespace daal::algorithms::linear_regression;
-
-#if 0
 
 // samples/daal/cpp/mysql/sources/utils.h
 void printNumericTable(const daal::data_management::NumericTablePtr & dataTable, const char * message = "");
@@ -39,7 +39,7 @@ inline void printArray(T* array, const size_t nPrintedCols, const size_t nPrinte
     std::cout << std::endl;
 }
 
-const size_t nFeatures         = 1; // dimensionality
+const size_t nFeatures         = 2; // dimensionality
 const size_t nObservations     = 10;
 
 int main(int argc, char* argv[])
@@ -54,12 +54,17 @@ int main(int argc, char* argv[])
                                               8.8f, 8.9f, 4,    9.0f, 9.1f, 9.2f, 9.3f, 9.4f, 9.5f, 9.6f, 9.7f, 9.8f, 9.9f, 5 };
 #endif
 
-    // cout << "Checking for data files under " DATA_FILES_DIR << endl;
+    cout << "Looking for data files at: " DATA_FILES_DIR << "." << endl;
+    if (! exists(DATA_FILES_DIR)) {
+        cout << "Expected data files path (" DATA_FILES_DIR << ") doestn't seem to exist" << endl;
+        return EXIT_FAILURE;
+    } else {
+        cout << "Looks like data files are where expected." << endl;
+    }
 
     std::vector<int> data(nFeatures * nObservations); 
 
     cout << "Creating data: \n";
-#if 0
     //std::iota(data.begin(), data.end(), 1); 
     std::iota(begin(data), end(data), -5); 
     std::copy(begin(data), end(data), ostream_iterator<int>{cout, ", "});
@@ -68,7 +73,6 @@ int main(int argc, char* argv[])
     cout << "Creating Numeric tables: \n";
     NumericTablePtr featuresTable(new HomogenNumericTable<int>(data.data(), nFeatures, nObservations));
     printNumericTable(featuresTable);
-#endif
 
     cout << "Done!" << endl;
 
@@ -96,11 +100,4 @@ void printNumericTable(const daal::data_management::NumericTablePtr & dataTable,
     dataTable->releaseBlockOfRows(block);
 
     return;
-}
-#endif
-
-int main(int argc, char* argv[])
-{
-    printf("Hello, world!\n");
-    return EXIT_SUCCESS;
 }
