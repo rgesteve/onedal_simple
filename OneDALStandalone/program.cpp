@@ -74,6 +74,20 @@ int main(int argc, char* argv[])
     NumericTablePtr featuresTable(new HomogenNumericTable<int>(data.data(), nFeatures, nObservations));
     printNumericTable(featuresTable);
 
+    cout << "Reading tables from CSV: \n";
+    const path& datasetFilename = path(DATA_FILES_DIR) / "linear_regression_train.csv";
+    if (!exists(datasetFilename)) {
+        cout << "Cannot find actual dataset file" << endl;
+        return EXIT_FAILURE;
+    }
+
+    FileDataSource<CSVFeatureManager> dataSource(datasetFilename.lexically_normal().string(), DataSource::notAllocateNumericTable, DataSource::doDictionaryFromContext);
+#if 0
+    NumericTablePtr data(new HomogenNumericTable<>(10, 0, NumericTable::doNotAllocate));
+    NumericTablePtr dependentVariables(new HomogenNumericTable<>(1, 0, NumericTable::doNotAllocate));
+    NumericTablePtr mergedData(new MergedNumericTable(data, dependentVariables));
+#endif
+
     cout << "Done!" << endl;
 
     return EXIT_SUCCESS;
