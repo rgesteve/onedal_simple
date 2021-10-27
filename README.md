@@ -17,6 +17,11 @@ Once you've bult (say, in directory "build"), you can run the program issuing:
 ```bash
 $ LD_LIBRARY_PATH=/opt/intel/oneapi/tbb/2021.4.0/lib/intel64/gcc4.8 build/OneDALNative
 ```
+you can also do
+```bash
+source /opt/intel/oneapi/setvars.sh
+```
+before you run the libraries.
 
 ## Building on Windows
 
