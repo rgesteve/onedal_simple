@@ -6,7 +6,7 @@ Just playing around with OneDAL API, verifying builds on Linux and Windows.
 
 ## Building on Linux
 
-Install OneDAL [for Ubuntu](https://software.intel.com/content/www/us/en/develop/articles/installing-intel-free-libs-and-python-apt-repo.html).  In principle, other packagings of OneDAL/OneAPI should work (in particular, if you install OneDAL using `conda` from the `conda-forge` channel).  However, some packagings do not include the CMake modules on which our build script depends.
+Install OneDAL [for Ubuntu](https://software.intel.com/content/www/us/en/develop/articles/installing-intel-free-libs-and-python-apt-repo.html)  (or from this [alternate set of instructions](https://neelravi.com/post/intel-oneapi-install/)).  In principle, other packagings of OneDAL/OneAPI should work (in particular, if you install OneDAL using `conda` from the `conda-forge` channel).  However, some packagings do not include the CMake modules on which our build script depends.
 
 Be sure to issue:
 ```bash
