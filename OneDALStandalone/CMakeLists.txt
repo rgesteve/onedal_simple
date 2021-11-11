@@ -19,7 +19,11 @@ configure_file(config.h.in config.h @ONLY)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(CMAKE_CXX_STANDARD 17)
+add_library(OneDALStandaloneTestLib SHARED function.cpp)
+
 add_executable(OneDALStandaloneTest program.cpp)
+target_link_libraries (OneDALStandaloneTest PUBLIC OneDALStandaloneTestLib)
+#target_link_libraries (OneDALStandaloneTest $<TARGET_OBJECTS:OneDALStandaloneTestLib>)
 set_target_properties(OneDALStandaloneTest PROPERTIES
         CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON

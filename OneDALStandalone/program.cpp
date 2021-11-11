@@ -12,6 +12,8 @@
 #include "data_management/data/internal/finiteness_checker.h"
 #endif
 
+#include "function.hpp"
+
 #include "config.h"
 
 using namespace std;
@@ -20,25 +22,6 @@ using namespace std::filesystem;
 using namespace daal;
 using namespace daal::data_management;
 using namespace daal::algorithms::linear_regression;
-
-// samples/daal/cpp/mysql/sources/utils.h
-void printNumericTable(const daal::data_management::NumericTablePtr & dataTable, const char * message = "");
-
-template <typename T>
-inline void printArray(T* array, const size_t nPrintedCols, const size_t nPrintedRows, const size_t nCols, const std::string & message, size_t interval = 10)
-{
-    std::cout << std::setiosflags(std::ios::left);
-    std::cout << message << std::endl;
-    for (size_t i = 0; i < nPrintedRows; i++) {
-        for (size_t j = 0; j < nPrintedCols; j++) {
-            std::cout << std::setw(interval) << std::setiosflags(std::ios::fixed) << std::setprecision(3);
-            std::cout << array[i * nCols + j];
-            std::cout << " "; // FIXME -- this should not be needed
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-}
 
 const size_t nFeatures         = 2; // dimensionality
 const size_t nObservations     = 10;
@@ -101,25 +84,3 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
 }
 
-void printNumericTable(const daal::data_management::NumericTablePtr & dataTable, const char * message)
-{
-    using namespace daal::data_management;
-
-    size_t nRows = dataTable->getNumberOfRows();
-    size_t nCols = dataTable->getNumberOfColumns();
-
-    cout << "The characteristics of the table are: \n";
-    cout << "nRows = " << nRows << endl;
-    cout << "nCols = " << nCols << endl;
-
-    size_t interval = 3; // separation between numbers
-    //BlockDescriptor<DAAL_DATA_TYPE> block;
-    BlockDescriptor<int> block;
-    {
-        dataTable->getBlockOfRows(0, nRows, readOnly, block);
-        printArray<int>(block.getBlockPtr(), /* nPrintedCols */ nRows, /* nPrintedRows */ nCols, nCols, message, interval);
-    }
-    dataTable->releaseBlockOfRows(block);
-
-    return;
-}
