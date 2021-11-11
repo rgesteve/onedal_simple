@@ -13,6 +13,8 @@ Be sure to issue:
 apt install intel-oneapi-daal-devel
 ```
 
+(there's a hopefully helpful script included called `install_onedal_ubuntu.sh`)
+
 Once you've bult (say, in directory "build"), you can run the program issuing:
 ```bash
 $ LD_LIBRARY_PATH=/opt/intel/oneapi/tbb/2021.4.0/lib/intel64/gcc4.8 build/OneDALNative
