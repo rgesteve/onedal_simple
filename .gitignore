@@ -8,4 +8,4 @@ obj/
 bin/
 build/
 output.txt
-
+*.nupkg
