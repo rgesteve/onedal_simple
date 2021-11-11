@@ -6,7 +6,7 @@ Just playing around with OneDAL API, verifying builds on Linux and Windows.
 
 ## Building on Linux
 
-Install OneDAL [for Ubuntu](https://software.intel.com/content/www/us/en/develop/articles/installing-intel-free-libs-and-python-apt-repo.html).  In principle, other packagings of OneDAL/OneAPI should work (in particular, if you install OneDAL using `conda` from the `conda-forge` channel).  However, some packagings do not include the CMake modules on which our build script depends.
+Install OneDAL [for Ubuntu](https://software.intel.com/content/www/us/en/develop/articles/installing-intel-free-libs-and-python-apt-repo.html)  (or from this [alternate set of instructions](https://neelravi.com/post/intel-oneapi-install/)).  In principle, other packagings of OneDAL/OneAPI should work (in particular, if you install OneDAL using `conda` from the `conda-forge` channel).  However, some packagings do not include the CMake modules on which our build script depends.
 
 Be sure to issue:
 ```bash
@@ -17,6 +17,11 @@ Once you've bult (say, in directory "build"), you can run the program issuing:
 ```bash
 $ LD_LIBRARY_PATH=/opt/intel/oneapi/tbb/2021.4.0/lib/intel64/gcc4.8 build/OneDALNative
 ```
+you can also do
+```bash
+source /opt/intel/oneapi/setvars.sh
+```
+before you run the libraries.
 
 ## Building on Windows
 
