@@ -2,6 +2,25 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" PrivateAssets="All" />
+  </ItemGroup>
+
+<!--
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveProjectReferences">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(_ResolvedProjectReferencePaths)"/>
+    </ItemGroup>
+  </Target>
+  -->
+
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+    </ItemGroup>
+  </Target>
 
 </Project>
