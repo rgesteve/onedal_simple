@@ -1,6 +1,9 @@
 {
     "folders" : [
         {
+            "path" : "."
+        },
+        {
             "path" : "CSPureLibSimpleConsoleConsumer"
         }
     ],
@@ -36,13 +39,21 @@
             {
                 "label": "build",
                 "command": "dotnet",
+                //"command": "echo",
                 "type": "process",
                 "args": [
                     "build",
-                    "${workspaceFolder:CSPureLibSimpleConsoleConsumer}/CSPureLibSimpleConsoleConsumer.csproj",
+                    "${workspaceFolder}/CSPureLibSimpleConsoleConsumer.sln",
                     "/property:GenerateFullPaths=true",
                     "/consoleloggerparameters:NoSummary"
                 ],
+                /*
+                "args" : [
+                    "The workspace here is: [",
+                    "${workspaceFolder}",
+                    "]"
+                ],
+                */
                 "problemMatcher": "$msCompile"
             },
             {

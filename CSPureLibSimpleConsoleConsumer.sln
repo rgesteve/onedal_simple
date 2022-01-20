@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSPureLibSimple", "CSPureLibSimple\CSPureLibSimple.csproj", "{ED70FC84-1CC6-4024-BEB8-12D1CA3A18D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSPureLibSimpleConsoleConsumer", "CSPureLibSimpleConsoleConsumer\CSPureLibSimpleConsoleConsumer.csproj", "{AB55DFD9-C34A-4A86-A628-6E1B85FB1412}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSPureLibSimpleUnitTests", "CSPureLibSimpleUnitTests\CSPureLibSimpleUnitTests.csproj", "{3F90E97F-C7B4-4A2C-897C-58C7C74AC318}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ED70FC84-1CC6-4024-BEB8-12D1CA3A18D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED70FC84-1CC6-4024-BEB8-12D1CA3A18D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED70FC84-1CC6-4024-BEB8-12D1CA3A18D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED70FC84-1CC6-4024-BEB8-12D1CA3A18D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB55DFD9-C34A-4A86-A628-6E1B85FB1412}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB55DFD9-C34A-4A86-A628-6E1B85FB1412}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB55DFD9-C34A-4A86-A628-6E1B85FB1412}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB55DFD9-C34A-4A86-A628-6E1B85FB1412}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F90E97F-C7B4-4A2C-897C-58C7C74AC318}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F90E97F-C7B4-4A2C-897C-58C7C74AC318}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F90E97F-C7B4-4A2C-897C-58C7C74AC318}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F90E97F-C7B4-4A2C-897C-58C7C74AC318}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

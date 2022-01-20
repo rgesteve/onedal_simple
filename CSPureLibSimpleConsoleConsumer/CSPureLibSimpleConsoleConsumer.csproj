@@ -5,7 +5,13 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+<!--
   <ItemGroup>
     <PackageReference Include="CSPureLibSimple" Version="1.0.0" />
+  </ItemGroup>
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\CSPureLibSimple\CSPureLibSimple.csproj" />
   </ItemGroup>
 </Project>
