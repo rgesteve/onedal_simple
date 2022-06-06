@@ -12,6 +12,10 @@ add_library(OneDALNative_lib SHARED function.cpp)
 add_executable(OneDALNative program.cpp)
 target_link_libraries(OneDALNative PUBLIC OneDALNative_lib ${oneDAL_IMPORTED_TARGETS})
 
+add_executable(OneDALKNNNative test_knn.cpp)
+#target_link_libraries(OneDALKNNNative PUBLIC OneDALNative_lib ${oneDAL_IMPORTED_TARGETS})
+target_link_libraries(OneDALKNNNative PUBLIC ${oneDAL_IMPORTED_TARGETS})
+
 # target_include_directories(OneDALNative PRIVATE ${oneDAL_INCLUDE_DIRS})
 # if (UNIX)
 #   target_link_libraries(OneDALNative PRIVATE -Wl,--start-group ${oneDAL_IMPORTED_TARGETS} -Wl,--end-group)
