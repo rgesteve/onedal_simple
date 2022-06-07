@@ -5,7 +5,11 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Microsoft.ML;
 using Microsoft.ML.Data;
+using Microsoft.ML.Runtime;
 using Microsoft.Data.Analysis;
+
+using Microsoft.Win32.SafeHandles;
+
 
 namespace CSTestLib
 {
@@ -65,17 +69,22 @@ namespace CSTestLib
 	}
 	var dataFrame = DataFrame.LoadCsv(dataPath, header: false);
 	var idf = dataFrame as IDataView;
-	Console.WriteLine($"[ {idf.Schema} ]");
+	Console.WriteLine($"[ {idf.Schema} ], with {dataFrame.Rows.Count} rows.");
 
 	MLContext ctx = new MLContext();
-	var ppl = ctx.Transforms.Concatenate("Features", "Column0", "Column1", "Column2", "Column3", "Column4");
+	var ppl = ctx.Transforms.Concatenate("Features", "Column0", "Column1", "Column2", "Column3", "Column4")
+	//.Append(ctx.Transforms.Conversion.ConvertType("Label", "Column5", DataKind.Int32)) // ML.NET claims it doesn't know how to carry this out [?!]
+	.Append(ctx.Transforms.Conversion.MapValueToKey("Label", "Column5")) // not quite the same as above, returns Key<UInt32, 0-4>
+	;
+
 	// transformed dataview
 	var tdv = ppl.Fit(idf).Transform(idf);
 	var featuresColumn = tdv.Schema["Features"];
-	var labelColumn = tdv.Schema["Column5"];
+	var labelColumn = tdv.Schema["Label"];
+	//var labelColumn = tdv.Schema["Column5"];
 	var feature0Column = tdv.Schema["Column0"];
 
-	//Console.WriteLine($"The type of aggregated features is {featuresColumn.Type}");
+	Console.WriteLine($"The type of the (hopefully recoded) labels is {labelColumn.Type}");
 
 	int samples = 0;
 	int maxSamples = 10;
@@ -83,10 +92,6 @@ namespace CSTestLib
 	int featureDimensionality = 5;  // should be able to get this from featuresColumn.Type
 	float[] data = new float[ maxSamples * featureDimensionality];
 	Span<float> dataSpan = new Span<float>(data);
-	Console.WriteLine($"Using an array of size {dataSpan.Length} to aggregate results");
-/*
-	//data.Clear();
-	*/
 
 	using (var cursor = tdv.GetRowCursor(new[] {feature0Column, featuresColumn, labelColumn})) {
 	  float f0Value = default;
@@ -256,5 +261,42 @@ namespace CSTestLib
       [DllImport(libPath, EntryPoint = "linearRegressionSingle")]
       public unsafe static extern void LinearRegressionSingle(void* features, void* labels, void* betas, int nRows, int nColumns);
     }
+  }
+
+  internal static class KNNInterface
+  {
+    public sealed class SafeKNNAlgorithmHandle : SafeHandleZeroOrMinusOneIsInvalid
+    {
+      private SafeKNNAlgorithmHandle()
+        : base(true)
+      {
+        /* empty */
+      }
+
+      protected override bool ReleaseHandle()
+      {
+        DestroyHandle(handle);
+        return true;
+      }
+    }
+
+#if _WINDOWS
+    const string libDirPath = @"C:\Users\rgesteve\Documents\projects\onedal_simple\build";
+    const string libPath = libDirPath + @"\Debug\OneDALNative_lib.dll";
+#else
+    //const string libDirPath = @"/data/Documents/Snippets/onedal/first/build";
+    const string libDirPath = @"/home/rgesteve/projects/onedal_simple/build";
+    const string libPath = libDirPath + "/libOneDALNative_lib.so";
+#endif
+
+    [DllImport(libPath)]
+    public unsafe static extern SafeKNNAlgorithmHandle CreateEngine(int numClasses);
+
+    [DllImport(libPath)]
+    private unsafe static extern void DestroyHandle(IntPtr algorithm);
+
+    [DllImport(libPath)]
+    public unsafe static extern int SanityCheckBlock(SafeKNNAlgorithmHandle engine, void* block, int blockSize);
+
   }
 }
