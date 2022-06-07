@@ -10,9 +10,16 @@ using Microsoft.Data.Analysis;
 
 using Microsoft.Win32.SafeHandles;
 
-
 namespace CSTestLib
 {
+  public class KNNTrainBundle
+  {
+    public float[] FlattenedTrainingSetFeatures;
+    //public float[] FlattenedTrainingSetLabels;
+    public int NumFeatures;
+    public int NumObservations;
+  }
+
   public class Calculator
   {
 
@@ -60,12 +67,12 @@ namespace CSTestLib
       Console.WriteLine();
     }
 
-    public static void ReadDataFilesUsingDF(string rootPath)
+    public static KNNTrainBundle? ReadDataFilesUsingDF(string rootPath)
     {
     	var dataPath = Path.Join(rootPath, "k_nearest_neighbors_test.csv");
 	if (!File.Exists(dataPath)) {
 	  Console.WriteLine($"Cannot find specified path");
-	  return;
+	  return null;
 	}
 	var dataFrame = DataFrame.LoadCsv(dataPath, header: false);
 	var idf = dataFrame as IDataView;
@@ -74,26 +81,32 @@ namespace CSTestLib
 	MLContext ctx = new MLContext();
 	var ppl = ctx.Transforms.Concatenate("Features", "Column0", "Column1", "Column2", "Column3", "Column4")
 	//.Append(ctx.Transforms.Conversion.ConvertType("Label", "Column5", DataKind.Int32)) // ML.NET claims it doesn't know how to carry this out [?!]
-	.Append(ctx.Transforms.Conversion.MapValueToKey("Label", "Column5")) // not quite the same as above, returns Key<UInt32, 0-4>
+	//.Append(ctx.Transforms.Conversion.MapValueToKey("Label", "Column5")) // not quite the same as above, returns Key<UInt32, 0-4>
 	;
 
 	// transformed dataview
 	var tdv = ppl.Fit(idf).Transform(idf);
 	var featuresColumn = tdv.Schema["Features"];
-	var labelColumn = tdv.Schema["Label"];
+	//var labelColumn = tdv.Schema["Label"];
 	//var labelColumn = tdv.Schema["Column5"];
 	var feature0Column = tdv.Schema["Column0"];
 
-	Console.WriteLine($"The type of the (hopefully recoded) labels is {labelColumn.Type}");
+	//Console.WriteLine($"The type of the (hopefully recoded) labels is {labelColumn.Type}");
+
+	int featureDimensionality = default(int);
+	if (featuresColumn.Type is VectorDataViewType vt) {
+	  featureDimensionality = vt.Size;
+	} else {
+	  return null;
+	}
 
 	int samples = 0;
 	int maxSamples = 10;
 
-	int featureDimensionality = 5;  // should be able to get this from featuresColumn.Type
 	float[] data = new float[ maxSamples * featureDimensionality];
 	Span<float> dataSpan = new Span<float>(data);
 
-	using (var cursor = tdv.GetRowCursor(new[] {feature0Column, featuresColumn, labelColumn})) {
+	using (var cursor = tdv.GetRowCursor(new[] {feature0Column, featuresColumn /*, labelColumn */})) {
 	  float f0Value = default;
   	  VBuffer<float> featureValues = default(VBuffer<float>);
 
@@ -109,9 +122,8 @@ namespace CSTestLib
 
 	    int offset = samples * featureDimensionality;
 
-	    /*
-	    Span<float> target = new Span<float>(dataSpan, offset, featureDimensionality);
-	    */
+	    // Span<float> target = new Span<float>(dataSpan, offset, featureDimensionality);
+
 	    Span<float> target = dataSpan.Slice(offset, featureDimensionality);
 	    featureValues.GetValues().CopyTo(target);
 	    /*
@@ -124,6 +136,12 @@ namespace CSTestLib
 	  }
 	}
 	DisplayLinearArray("aggregate of data", data);
+
+	return new KNNTrainBundle {
+	  FlattenedTrainingSetFeatures = data,
+	  NumFeatures = featureDimensionality,
+	  NumObservations = samples
+	};
     }
 
     public static void ReadDataFiles(string rootPath)

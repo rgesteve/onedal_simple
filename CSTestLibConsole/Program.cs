@@ -35,12 +35,16 @@ namespace CSTestLibConsole
 
 	    knn.CreateTable(testArray, 10, 100);
 
-/*
 	    var rootPath = Environment.GetEnvironmentVariable("DATAPATH");
             Console.WriteLine($"trying with rootPath {rootPath}!");
 	    //Calculator.ReadDataFiles(rootPath);
-	    Calculator.ReadDataFilesUsingDF(rootPath);
-	    */
+	    KNNTrainBundle? bundle = Calculator.ReadDataFilesUsingDF(rootPath);
+	    if (bundle == null) {
+	      Console.WriteLine("Error reading and parsing file");
+	      return;
+	    } 
+	    Console.WriteLine($"Got a set of {bundle.NumFeatures} rows and {bundle.NumObservations} columns");
+    	    knn.CreateTable(bundle.FlattenedTrainingSetFeatures, bundle.NumFeatures, bundle.NumObservations);
 
 /*
             var calc = new Calculator();
