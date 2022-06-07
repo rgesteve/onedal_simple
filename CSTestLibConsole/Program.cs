@@ -43,8 +43,14 @@ namespace CSTestLibConsole
 	      Console.WriteLine("Error reading and parsing file");
 	      return;
 	    } 
-	    Console.WriteLine($"Got a set of {bundle.NumFeatures} rows and {bundle.NumObservations} columns");
-    	    knn.CreateTable(bundle.FlattenedTrainingSetFeatures, bundle.NumFeatures, bundle.NumObservations);
+	    Console.WriteLine($"Got a set of {bundle.NumFeatures} rows and {bundle.NumObservations} columns, with labels: ");
+	    var labels = bundle.FlattenedTrainingSetLabels;
+	    for (int i = 0; i < labels.Length; i++) {
+	      Console.Write($"{labels[i]} ");
+	    }
+	    Console.WriteLine();
+
+	    knn.CreateTable(bundle.FlattenedTrainingSetFeatures, bundle.NumFeatures, bundle.NumObservations);
 
 /*
             var calc = new Calculator();
