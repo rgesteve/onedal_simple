@@ -12,6 +12,7 @@
 #include <vector>
 #include <queue>
 
+#if 0
 /**
  * @brief Class for defining printing precision
  * @tparam type type name to define presicion value
@@ -97,6 +98,7 @@ void printNumericTables(daal::data_management::NumericTablePtr dataTable1, daal:
 {
     printNumericTables<type1, type2>(dataTable1.get(), dataTable2.get(), title1, title2, message, nPrintedRows, interval);
 }
+#endif
 
 template <typename T>
 void lookAtTable(daal::data_management::NumericTable * dataTable)
@@ -149,12 +151,11 @@ private:
   
   bf_knn_classification::training::Batch<> train_algorithm;
   bf_knn_classification::prediction::Batch<> predict_algorithm;
-  string _message;
   size_t _numClasses;
+
 public:
-  KNNAlgorithm(string message, size_t numClasses = 2)
+  KNNAlgorithm(size_t numClasses = 2)
   {
-    _message = message;
     _numClasses = numClasses;
   }
 
@@ -194,18 +195,19 @@ public:
 
   }
 
-  const string& display_message()
-  {
-    return _message;
-  }
 };
 
-#if 0
 /* Input data set parameters */
+#if 1
+// Looks like CSV reader as currently configured doesn't like headers
+#if 0
 string trainDatasetFileName = "../data/batch/k_nearest_neighbors_train.csv";
 string testDatasetFileName  = "../data/batch/k_nearest_neighbors_test.csv";
 #else
-/* Input data set parameters */
+string trainDatasetFileName = "/home/rgesteve/projects/onedal_simple/OneDALStandalone/data/k_nearest_neighbors_train.csv";
+string testDatasetFileName  = "/home/rgesteve/projects/onedal_simple/OneDALStandalone/data/k_nearest_neighbors_test.csv";
+#endif
+#else
 string trainDatasetFileName = "/home/rgesteve/projects/oneDAL/examples/daal/data/batch/k_nearest_neighbors_train.csv";
 string testDatasetFileName  = "/home/rgesteve/projects/oneDAL/examples/daal/data/batch/k_nearest_neighbors_test.csv";
 #endif
@@ -220,9 +222,11 @@ NumericTablePtr testData;
 
 void trainModel();
 void testModel();
+#if 0
 void printResults();
+#endif
 
-KNNAlgorithm knn("Testing a class", nClasses);
+KNNAlgorithm knn(nClasses);
 
 int main(int argc, char *argv[]) {
 
@@ -233,11 +237,11 @@ int main(int argc, char *argv[]) {
 
     trainModel();
     testModel();
-    //printResults();
+#if 0
+    printResults();
+#endif
     knn.print_results();
 
-    cout << "Testing instance: [" << knn.display_message() << "]" << endl;
-    
     cout << "Done!!\n" << endl;
 
     return 0;
@@ -257,30 +261,11 @@ void trainModel() {
     /* Retrieve the data from the input file */
     trainDataSource.loadDataBlock(mergedData.get());
 
-    #if 0
-    // lookAtTable<float>(trainData.get());
-    /* Create an algorithm object to train the KD-tree based kNN model */
-    bf_knn_classification::training::Batch<> algorithm;
-
-    /* Pass the training data set and dependent values to the algorithm */
-    algorithm.input.set(classifier::training::data, trainData);
-    algorithm.input.set(classifier::training::labels, trainGroundTruth);
-    algorithm.parameter().nClasses = nClasses;
-    #endif
-
+    cout << "------ setting training data -------" <<endl;
     knn.set_train_data(trainData, trainGroundTruth);
-
     cout << "------ before calling compute -------" <<endl;
-#if 0
-    algorithm.compute();
-#endif
     knn.train();
     cout << "------ done training -------" <<endl;
-
-    #if 0
-    /* Retrieve the results of the training algorithm  */
-    trainingResult = algorithm.getResult();
-    #endif
 }
 
 void testModel() {
@@ -298,38 +283,18 @@ void testModel() {
     /* Retrieve the data from input file */
     testDataSource.loadDataBlock(mergedData.get());
 
-    #if 0
-    /* Create algorithm objects for brute force based kNN prediction with the default
-     * method */
-    bf_knn_classification::prediction::Batch<> algorithm;
-
-    /* Pass the testing data set and trained model to the algorithm */
-    algorithm.input.set(classifier::prediction::data, testData);
-    algorithm.input.set(classifier::prediction::model,
-                        trainingResult->get(classifier::training::model));
-    algorithm.parameter().nClasses = nClasses;
-    algorithm.parameter().resultsToCompute = bf_knn_classification::computeDistances | bf_knn_classification::computeIndicesOfNeighbors;
-    #endif
-
     cout << "------ setting data in class -------" <<endl;
     knn.set_test_data(testData);
 
     cout << "------ start predicting -------" <<endl;
 
     /* Compute prediction results */
-    #if 0
-    algorithm.compute();
-    #endif
     knn.predict();
 
     cout << "------ done predicting -------" <<endl;
-
-    #if 0
-    /* Retrieve algorithm results */
-    predictionResult = algorithm.getResult();
-    #endif
 }
 
+#if 0
 void printResults() {
     printNumericTables<int, int>(
         testGroundTruth,
@@ -342,4 +307,4 @@ void printResults() {
         "Indices", "Distances",
         "Brute force kNN classification results (first 20 observations):", 20);
 }
-
+#endif
