@@ -50,19 +50,18 @@ void KNNAlgorithm::print_results()
   lookAtTable<int>(results.get());
 }
 
-float KNNAlgorithm::sanity_check_data(void* dataBlock, int blockSize)
+float KNNAlgorithm::sanity_check_data(void* dataBlock, int blockSize, void* outputArray)
 {
   using namespace std;
 
   float acc = 0.f;
   float* original = (float*)dataBlock;
+  float* output = (float*)outputArray;
 
-  cout << "Running in native code, got a block of size " << blockSize << "." << endl;
-  
   for (int i = 0; i < blockSize; i++) {
     acc += original[i];
+    output[i] = 2.f * original[i];
   }
-  cout << "Should be returning " << acc << "." << endl;
   
   return acc;
 }

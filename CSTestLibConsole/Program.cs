@@ -23,10 +23,16 @@ namespace CSTestLibConsole
 	    Console.WriteLine($"Configured knn to have {knn.HowManyClasses()} classes.");
 
 	    var testArray = LinSpace(0, 1, 1000);
+	    float[] outArray = new float[ testArray.Length ];
 	    Console.WriteLine($"Created a test array of length [{testArray.Length}]");
 
-	    float sumFromNative = knn.SanityCheckBlock(testArray);
+	    float sumFromNative = knn.SanityCheckBlock(testArray, outArray);
     	    Console.WriteLine($"The result from calculating the sum in native code: [{sumFromNative}]");
+	    Console.WriteLine("The first elements of output array are:");
+	    for (int i = 0; i < 10; i++) {
+	      Console.Write($"({testArray[i]}, {outArray[i]}), ");
+	    }
+	    Console.WriteLine();
 
 /*
 	    var rootPath = Environment.GetEnvironmentVariable("DATAPATH");
