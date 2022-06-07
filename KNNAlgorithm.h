@@ -75,6 +75,7 @@ public:
   void set_test_data(NumericTablePtr test_features_dataset);
   void predict();
   void print_results();
+  void train_with_data(void* trainData, void* labelData, int numFeatures, int numObservations);
   float sanity_check_data(void* dataBlock, int blockSize, void* outputArray);
   int create_knn_table(void* dataBlock, int numCols, int numRows);
 };

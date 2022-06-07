@@ -74,3 +74,15 @@ int KNNAlgorithm::create_knn_table(void* dataBlock, int numCols, int numRows)
 
   return 0;
 }
+
+void KNNAlgorithm::train_with_data(void* trainData, void* labelData, int numFeatures, int numObservations)
+{
+  float* originalData = (float*)trainData;
+  float* originalLabels = (float*)labelData;
+  NumericTablePtr trainTable(new HomogenNumericTable<float>(originalData, numFeatures, numObservations));
+  NumericTablePtr labelTable(new HomogenNumericTable<float>(originalLabels, 1, numObservations));
+
+  set_train_data(trainTable, labelTable);
+  train();
+  return;
+}

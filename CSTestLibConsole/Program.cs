@@ -38,7 +38,9 @@ namespace CSTestLibConsole
 	    var rootPath = Environment.GetEnvironmentVariable("DATAPATH");
             Console.WriteLine($"trying with rootPath {rootPath}!");
 	    //Calculator.ReadDataFiles(rootPath);
+#nullable enable
 	    KNNTrainBundle? bundle = Calculator.ReadDataFilesUsingDF(rootPath);
+#nullable disable
 	    if (bundle == null) {
 	      Console.WriteLine("Error reading and parsing file");
 	      return;
@@ -52,12 +54,12 @@ namespace CSTestLibConsole
 
 	    knn.CreateTable(bundle.FlattenedTrainingSetFeatures, bundle.NumFeatures, bundle.NumObservations);
 
-/*
+#if false
             var calc = new Calculator();
             Console.WriteLine($"Calling library with 4 and 5: {calc.Add(4, 5)}...");
             Calculator.CSCreateTable();
             Calculator.LinRegTrain(1, 100);
-	    	    */
+#endif
             Console.WriteLine("Done!");
 
         }

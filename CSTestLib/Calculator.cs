@@ -15,7 +15,7 @@ namespace CSTestLib
   public class KNNTrainBundle
   {
     public float[] FlattenedTrainingSetFeatures;
-    //public float[] FlattenedTrainingSetLabels;
+    public float[] FlattenedTrainingSetLabels;
     public int NumFeatures;
     public int NumObservations;
   }
@@ -88,10 +88,10 @@ namespace CSTestLib
 	var tdv = ppl.Fit(idf).Transform(idf);
 	var featuresColumn = tdv.Schema["Features"];
 	//var labelColumn = tdv.Schema["Label"];
-	//var labelColumn = tdv.Schema["Column5"];
+	var labelColumn = tdv.Schema["Column5"];
 	var feature0Column = tdv.Schema["Column0"];
 
-	//Console.WriteLine($"The type of the (hopefully recoded) labels is {labelColumn.Type}");
+	Console.WriteLine($"The type of the (hopefully recoded) labels is {labelColumn.Type}");
 
 	int featureDimensionality = default(int);
 	if (featuresColumn.Type is VectorDataViewType vt) {
@@ -104,33 +104,29 @@ namespace CSTestLib
 	int maxSamples = 10;
 
 	float[] data = new float[ maxSamples * featureDimensionality];
+	float[] dataLabels = new float[ maxSamples ];
 	Span<float> dataSpan = new Span<float>(data);
 
-	using (var cursor = tdv.GetRowCursor(new[] {feature0Column, featuresColumn /*, labelColumn */})) {
+	using (var cursor = tdv.GetRowCursor(new[] {feature0Column, featuresColumn, labelColumn })) {
 	  float f0Value = default;
+	  float labelValue = default;
   	  VBuffer<float> featureValues = default(VBuffer<float>);
 
 	  var f0Getter = cursor.GetGetter<float>(feature0Column);
   	  var featureGetter = cursor.GetGetter< VBuffer<float> >(featuresColumn);
+  	  var labelGetter = cursor.GetGetter<float>(labelColumn);
 
 	  while (cursor.MoveNext() && samples < maxSamples) {
-	    f0Getter(ref f0Value);
-	    Console.Write($"row {samples}: {f0Value}");
   	  
 	    featureGetter(ref featureValues);
-	    DisplaySpan<float>($"features at row {samples}: ", featureValues.GetValues());
+	    labelGetter(ref labelValue);
+	    // DisplaySpan<float>($"features at row {samples}: ", featureValues.GetValues());
 
 	    int offset = samples * featureDimensionality;
-
 	    // Span<float> target = new Span<float>(dataSpan, offset, featureDimensionality);
-
 	    Span<float> target = dataSpan.Slice(offset, featureDimensionality);
 	    featureValues.GetValues().CopyTo(target);
-	    /*
-	    float[] t = featureValues.GetValues().ToArray();
-	    for (int i = 0; i < featureDimensionality; i++) {
-	      Console.Write($"{t[i]}");
-	    }*/
+	    dataLabels[samples] = labelValue;
 
 	    samples++;
 	  }
@@ -139,6 +135,7 @@ namespace CSTestLib
 
 	return new KNNTrainBundle {
 	  FlattenedTrainingSetFeatures = data,
+	  FlattenedTrainingSetLabels = dataLabels,
 	  NumFeatures = featureDimensionality,
 	  NumObservations = samples
 	};
@@ -317,6 +314,9 @@ namespace CSTestLib
     public unsafe static extern int CreateKNNTable(SafeKNNAlgorithmHandle engine, void* block, int numCols, int numRows);
 
     [DllImport(libPath)]
+    public unsafe static extern void Train(SafeKNNAlgorithmHandle engine, void* trainingData, void* labelData, int numCols, int numRows);
+
+    [DllImport(libPath)]
     public unsafe static extern float SanityCheckBlock(SafeKNNAlgorithmHandle engine, void* block, int blockSize, void* outputArray);
 
   }
@@ -351,6 +351,17 @@ namespace CSTestLib
 	}
       }
       return ret;
+    }
+
+    public void Train(float[] trainData, float[] labelData, int numTrainingCols, int numRows)
+    {
+      unsafe {
+        fixed (void* trainDataPtr = &trainData[0],
+	             labelDataPtr = &labelData[0]) {
+	  KNNInterface.Train(_engine, trainDataPtr, labelDataPtr, numTrainingCols, numRows);
+	}
+      }
+
     }
 
     public void Dispose()
