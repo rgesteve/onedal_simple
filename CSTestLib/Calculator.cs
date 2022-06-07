@@ -296,7 +296,33 @@ namespace CSTestLib
     private unsafe static extern void DestroyHandle(IntPtr algorithm);
 
     [DllImport(libPath)]
+    public unsafe static extern int HowManyClasses(SafeKNNAlgorithmHandle engine);
+
+    [DllImport(libPath)]
     public unsafe static extern int SanityCheckBlock(SafeKNNAlgorithmHandle engine, void* block, int blockSize);
 
+  }
+
+  public sealed class KNNClassifier : IDisposable
+  {
+    private readonly KNNInterface.SafeKNNAlgorithmHandle _engine;
+    private bool _isDisposed;
+
+    public KNNClassifier(int numClasses)
+    {
+      _engine = KNNInterface.CreateEngine(numClasses);
+    }
+
+    public int HowManyClasses()
+    {
+      return KNNInterface.HowManyClasses(_engine);
+    }
+
+    public void Dispose()
+    {
+      if (_isDisposed) return;
+      _isDisposed = true;
+      _engine.Dispose();
+    }
   }
 }

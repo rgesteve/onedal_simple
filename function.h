@@ -206,6 +206,11 @@ ONEDAL_C_EXPORT KNNAlgorithm* CreateEngine(int numClasses)
   return new KNNAlgorithm(numClasses);
 }
 
+ONEDAL_C_EXPORT int HowManyClasses(KNNAlgorithm* engine)
+{
+  return engine->how_many_classes();
+}
+
 ONEDAL_C_EXPORT void DestroyEngine(KNNAlgorithm* engine)
 {
   delete engine;

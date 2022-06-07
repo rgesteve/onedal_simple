@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using static System.MathF;
 
 using CSTestLib;
 
@@ -6,12 +8,22 @@ namespace CSTestLibConsole
 {
     class Program
     {
+
+        public static float[] LinSpace(float startVal, float endVal, int steps)
+        {
+          float interval = (endVal / MathF.Abs(endVal)) * MathF.Abs(endVal - startVal)/(steps -1);
+          return Enumerable.Range(0, steps).Select(i => (startVal + (i*interval))).ToArray();
+        }
+	
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
 
 	    KNNClassifier knn = new KNNClassifier(5);
 	    Console.WriteLine($"Configured knn to have {knn.HowManyClasses()} classes.");
+
+	    var testArray = LinSpace(-1, 1, 1000);
+	    Console.WriteLine($"Created a test array of lenght [{testArray.Length}]");
 
 /*
 	    var rootPath = Environment.GetEnvironmentVariable("DATAPATH");

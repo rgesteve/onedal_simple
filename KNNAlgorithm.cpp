@@ -49,3 +49,8 @@ int KNNAlgorithm::sanity_check_data(void* dataBlock, int blockSize)
 {
   return 0;
 }
+
+int KNNAlgorithm::how_many_classes()
+{
+  return (int)_numClasses;
+}
