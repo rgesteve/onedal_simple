@@ -76,7 +76,7 @@ public:
   void predict();
   void print_results();
   float sanity_check_data(void* dataBlock, int blockSize, void* outputArray);
-  int how_many_classes();
+  int create_knn_table(void* dataBlock, int numCols, int numRows);
 };
 
 #endif

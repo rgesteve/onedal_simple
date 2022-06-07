@@ -20,7 +20,6 @@ namespace CSTestLibConsole
             Console.WriteLine("Hello World!");
 
 	    KNNClassifier knn = new KNNClassifier(5);
-	    Console.WriteLine($"Configured knn to have {knn.HowManyClasses()} classes.");
 
 	    var testArray = LinSpace(0, 1, 1000);
 	    float[] outArray = new float[ testArray.Length ];
@@ -33,6 +32,8 @@ namespace CSTestLibConsole
 	      Console.Write($"({testArray[i]}, {outArray[i]}), ");
 	    }
 	    Console.WriteLine();
+
+	    knn.CreateTable(testArray, 10, 100);
 
 /*
 	    var rootPath = Environment.GetEnvironmentVariable("DATAPATH");

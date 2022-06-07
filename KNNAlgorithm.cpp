@@ -66,7 +66,11 @@ float KNNAlgorithm::sanity_check_data(void* dataBlock, int blockSize, void* outp
   return acc;
 }
 
-int KNNAlgorithm::how_many_classes()
+int KNNAlgorithm::create_knn_table(void* dataBlock, int numCols, int numRows)
 {
-  return (int)_numClasses;
+  float* original = (float*)dataBlock;
+  NumericTablePtr table(new HomogenNumericTable<float>(original, numCols, numRows));
+  lookAtTable<float>(table.get());
+
+  return 0;
 }

@@ -206,11 +206,6 @@ ONEDAL_C_EXPORT KNNAlgorithm* CreateEngine(int numClasses)
   return new KNNAlgorithm(numClasses);
 }
 
-ONEDAL_C_EXPORT int HowManyClasses(KNNAlgorithm* engine)
-{
-  return engine->how_many_classes();
-}
-
 ONEDAL_C_EXPORT void DestroyEngine(KNNAlgorithm* engine)
 {
   delete engine;
@@ -220,6 +215,12 @@ ONEDAL_C_EXPORT float SanityCheckBlock(KNNAlgorithm* engine, void* block, int bl
 {
   float acc = engine->sanity_check_data(block, blockSize, outputArray);
   return acc;
+}
+
+ONEDAL_C_EXPORT float CreateKNNTable(KNNAlgorithm* engine, void* block, int numCols, int numRows)
+{
+  int ret = engine->create_knn_table(block, numCols, numRows);
+  return ret;
 }
 
 #endif
