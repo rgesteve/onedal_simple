@@ -45,7 +45,7 @@ void KNNAlgorithm::print_results()
   lookAtTable<int>(results.get());
 }
 
-int sanity_check_data(void* dataBlock, int blockSize)
+int KNNAlgorithm::sanity_check_data(void* dataBlock, int blockSize)
 {
   return 0;
 }

@@ -18,6 +18,8 @@
 #include "daal.h"
 #include "data_management/data/internal/finiteness_checker.h"
 
+#include "KNNAlgorithm.h"
+
 using namespace std;
 using namespace daal;
 using namespace daal::algorithms;
@@ -196,5 +198,23 @@ ONEDAL_C_EXPORT void linearRegressionDouble(void * features, void * label, void 
 ONEDAL_C_EXPORT void linearRegressionSingle(void * features, void * label, void * betas, int nRows, int nColumns);
 ONEDAL_C_EXPORT void ridgeRegressionDouble(void * features, void * label, void * betas, int nRows, int nColumns, float l2Reg);
 ONEDAL_C_EXPORT void ridgeRegressionSingle(void * features, void * label, void * betas, int nRows, int nColumns, float l2Reg);
+
+// ------------------------------------------------------------
+
+ONEDAL_C_EXPORT KNNAlgorithm* CreateEngine(int numClasses)
+{
+  return new KNNAlgorithm(numClasses);
+}
+
+ONEDAL_C_EXPORT void DestroyEngine(KNNAlgorithm* engine)
+{
+  delete engine;
+}
+
+ONEDAL_C_EXPORT int SanityCheckBlock(KNNAlgorithm* engine, void* block, int blockSize)
+{
+  engine->sanity_check_data(block, blockSize);
+  return 0;
+}
 
 #endif

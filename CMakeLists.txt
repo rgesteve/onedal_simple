@@ -8,7 +8,7 @@ find_package(oneDAL CONFIG REQUIRED)
 include_directories(${oneDAL_INCLUDE_DIRS})
 link_libraries(${oneDAL_IMPORTED_TARGETS})
 
-add_library(OneDALNative_lib SHARED function.cpp)
+add_library(OneDALNative_lib SHARED function.cpp KNNAlgorithm.cpp)
 add_executable(OneDALNative program.cpp)
 target_link_libraries(OneDALNative PUBLIC OneDALNative_lib ${oneDAL_IMPORTED_TARGETS})
 
