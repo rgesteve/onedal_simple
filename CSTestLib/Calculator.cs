@@ -299,7 +299,7 @@ namespace CSTestLib
     public unsafe static extern int HowManyClasses(SafeKNNAlgorithmHandle engine);
 
     [DllImport(libPath)]
-    public unsafe static extern int SanityCheckBlock(SafeKNNAlgorithmHandle engine, void* block, int blockSize);
+    public unsafe static extern float SanityCheckBlock(SafeKNNAlgorithmHandle engine, void* block, int blockSize);
 
   }
 
@@ -316,6 +316,17 @@ namespace CSTestLib
     public int HowManyClasses()
     {
       return KNNInterface.HowManyClasses(_engine);
+    }
+
+    public float SanityCheckBlock(float[] block)
+    {
+      float ret = default(float);
+      unsafe {
+        fixed (void* dataPtr = &block[0]) {
+	  ret = KNNInterface.SanityCheckBlock(_engine, dataPtr, block.Length);  // not sure if I should return from inside a fixed block
+	}
+      }
+      return ret;
     }
 
     public void Dispose()

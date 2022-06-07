@@ -216,10 +216,10 @@ ONEDAL_C_EXPORT void DestroyEngine(KNNAlgorithm* engine)
   delete engine;
 }
 
-ONEDAL_C_EXPORT int SanityCheckBlock(KNNAlgorithm* engine, void* block, int blockSize)
+ONEDAL_C_EXPORT float SanityCheckBlock(KNNAlgorithm* engine, void* block, int blockSize)
 {
-  engine->sanity_check_data(block, blockSize);
-  return 0;
+  float acc = engine->sanity_check_data(block, blockSize);
+  return acc;
 }
 
 #endif

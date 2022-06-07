@@ -22,8 +22,11 @@ namespace CSTestLibConsole
 	    KNNClassifier knn = new KNNClassifier(5);
 	    Console.WriteLine($"Configured knn to have {knn.HowManyClasses()} classes.");
 
-	    var testArray = LinSpace(-1, 1, 1000);
-	    Console.WriteLine($"Created a test array of lenght [{testArray.Length}]");
+	    var testArray = LinSpace(0, 1, 1000);
+	    Console.WriteLine($"Created a test array of length [{testArray.Length}]");
+
+	    float sumFromNative = knn.SanityCheckBlock(testArray);
+    	    Console.WriteLine($"The result from calculating the sum in native code: [{sumFromNative}]");
 
 /*
 	    var rootPath = Environment.GetEnvironmentVariable("DATAPATH");

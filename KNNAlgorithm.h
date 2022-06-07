@@ -75,7 +75,7 @@ public:
   void set_test_data(NumericTablePtr test_features_dataset);
   void predict();
   void print_results();
-  int sanity_check_data(void* dataBlock, int blockSize);
+  float sanity_check_data(void* dataBlock, int blockSize);
   int how_many_classes();
 };
 

@@ -5,6 +5,11 @@ using namespace daal;
 using namespace daal::algorithms;
 using namespace daal::data_management;
 
+// TODO -- this is just for debugging
+#if 1
+#include <iostream>
+#endif
+
 KNNAlgorithm::KNNAlgorithm(size_t numClasses = 2)
 {
   _numClasses = numClasses;
@@ -45,9 +50,21 @@ void KNNAlgorithm::print_results()
   lookAtTable<int>(results.get());
 }
 
-int KNNAlgorithm::sanity_check_data(void* dataBlock, int blockSize)
+float KNNAlgorithm::sanity_check_data(void* dataBlock, int blockSize)
 {
-  return 0;
+  using namespace std;
+
+  float acc = 0.f;
+  float* original = (float*)dataBlock;
+
+  cout << "Running in native code, got a block of size " << blockSize << "." << endl;
+  
+  for (int i = 0; i < blockSize; i++) {
+    acc += original[i];
+  }
+  cout << "Should be returning " << acc << "." << endl;
+  
+  return acc;
 }
 
 int KNNAlgorithm::how_many_classes()
