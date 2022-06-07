@@ -12,7 +12,7 @@ add_library(OneDALNative_lib SHARED function.cpp)
 add_executable(OneDALNative program.cpp)
 target_link_libraries(OneDALNative PUBLIC OneDALNative_lib ${oneDAL_IMPORTED_TARGETS})
 
-add_executable(OneDALKNNNative test_knn.cpp)
+add_executable(OneDALKNNNative test_knn.cpp KNNAlgorithm.cpp)
 #target_link_libraries(OneDALKNNNative PUBLIC OneDALNative_lib ${oneDAL_IMPORTED_TARGETS})
 target_link_libraries(OneDALKNNNative PUBLIC ${oneDAL_IMPORTED_TARGETS})
 
