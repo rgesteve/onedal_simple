@@ -69,7 +69,7 @@ namespace CSTestLib
 
     public static KNNTrainBundle? ReadDataFilesUsingDF(string rootPath)
     {
-    	var dataPath = Path.Join(rootPath, "k_nearest_neighbors_test.csv");
+    	var dataPath = Path.Join(rootPath, "k_nearest_neighbors_train.csv");
 	if (!File.Exists(dataPath)) {
 	  Console.WriteLine($"Cannot find specified path");
 	  return null;
@@ -101,7 +101,7 @@ namespace CSTestLib
 	}
 
 	int samples = 0;
-	int maxSamples = 10;
+	int maxSamples = 10000;
 
 	float[] data = new float[ maxSamples * featureDimensionality];
 	float[] dataLabels = new float[ maxSamples ];
@@ -131,7 +131,9 @@ namespace CSTestLib
 	    samples++;
 	  }
 	}
+#if false
 	DisplayLinearArray("aggregate of data", data);
+#endif
 
 	return new KNNTrainBundle {
 	  FlattenedTrainingSetFeatures = data,

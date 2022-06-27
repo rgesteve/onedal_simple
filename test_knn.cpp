@@ -11,6 +11,7 @@
 #include <cstdarg>
 #include <vector>
 #include <queue>
+#include <chrono>
 
 #include "KNNAlgorithm.h"
 
@@ -106,6 +107,7 @@ using namespace std;
 using namespace daal;
 using namespace daal::algorithms;
 using namespace daal::data_management;
+using namespace std::chrono;
 
 /* Input data set parameters */
 #if 1
@@ -130,7 +132,11 @@ bf_knn_classification::prediction::ResultPtr predictionResult;
 NumericTablePtr testGroundTruth;
 NumericTablePtr testData;
 
+#if 0
 void trainModel();
+#else
+void trainModel(NumericTablePtr, NumericTablePtr);
+#endif
 void testModel();
 #if 0
 void printResults();
@@ -147,19 +153,33 @@ int main(int argc, char *argv[]) {
 
     cout << "Begin training!!\n" << endl;
 
-    trainModel();
+    // Initialize FileDataSource<CSVFeatureManager> to retrieve the input data from a .csv file
+    FileDataSource<CSVFeatureManager> trainDataSource(trainDatasetFileName, DataSource::notAllocateNumericTable, DataSource::doDictionaryFromContext);
+
+    // Create Numeric Tables for training data and labels 
+    NumericTablePtr trainData(new HomogenNumericTable<>(nFeatures, 0, NumericTable::doNotAllocate));
+    NumericTablePtr trainGroundTruth(new HomogenNumericTable<>(1, 0, NumericTable::doNotAllocate));
+    NumericTablePtr mergedData(new MergedNumericTable(trainData, trainGroundTruth));
+
+    // Retrieve the data from the input file 
+    trainDataSource.loadDataBlock(mergedData.get());
+
+    auto startTime = std::chrono::system_clock::now();
+    trainModel(trainData, trainGroundTruth);
+    auto endTime = std::chrono::system_clock::now();
     testModel();
+
 #if 0
     printResults();
 #endif
     knn.print_results();
 
-    cout << "Done!!\n" << endl;
-
+    cout << duration_cast<nanoseconds>(endTime - startTime).count() << " nanosec \n";
     return 0;
 }
 
-void trainModel() {
+void trainModel(NumericTablePtr trainData, NumericTablePtr trainGroundTruth) {
+#if 0
     /* Initialize FileDataSource<CSVFeatureManager> to retrieve the input data
      * from a .csv file */
     FileDataSource<CSVFeatureManager> trainDataSource(
@@ -172,6 +192,7 @@ void trainModel() {
 
     /* Retrieve the data from the input file */
     trainDataSource.loadDataBlock(mergedData.get());
+#endif
 
     cout << "------ setting training data -------" <<endl;
     knn.set_train_data(trainData, trainGroundTruth);

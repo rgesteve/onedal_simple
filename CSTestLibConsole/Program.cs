@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Diagnostics;
 using static System.MathF;
 
 using CSTestLib;
@@ -21,6 +22,7 @@ namespace CSTestLibConsole
 
 	    KNNClassifier knn = new KNNClassifier(5);
 
+#if false
 	    var testArray = LinSpace(0, 1, 1000);
 	    float[] outArray = new float[ testArray.Length ];
 	    Console.WriteLine($"Created a test array of length [{testArray.Length}]");
@@ -34,6 +36,7 @@ namespace CSTestLibConsole
 	    Console.WriteLine();
 
 	    knn.CreateTable(testArray, 10, 100);
+#endif
 
 	    var rootPath = Environment.GetEnvironmentVariable("DATAPATH");
             Console.WriteLine($"trying with rootPath {rootPath}!");
@@ -44,15 +47,25 @@ namespace CSTestLibConsole
 	    if (bundle == null) {
 	      Console.WriteLine("Error reading and parsing file");
 	      return;
-	    } 
+	    }
+#if false
 	    Console.WriteLine($"Got a set of {bundle.NumFeatures} rows and {bundle.NumObservations} columns, with labels: ");
 	    var labels = bundle.FlattenedTrainingSetLabels;
 	    for (int i = 0; i < labels.Length; i++) {
 	      Console.Write($"{labels[i]} ");
 	    }
 	    Console.WriteLine();
+#endif
 
-	    knn.CreateTable(bundle.FlattenedTrainingSetFeatures, bundle.NumFeatures, bundle.NumObservations);
+	    //knn.CreateTable(bundle.FlattenedTrainingSetFeatures, bundle.NumFeatures, bundle.NumObservations);
+	    
+	    Stopwatch timer = new Stopwatch();
+	    timer.Start();
+    	    knn.Train(bundle.FlattenedTrainingSetFeatures, bundle.FlattenedTrainingSetLabels,
+	    	      bundle.NumFeatures, bundle.NumObservations);
+	    timer.Stop();
+
+      	    Console.WriteLine($"Looks like training worked, spending {timer.ElapsedTicks} ticks");
 
 #if false
             var calc = new Calculator();
