@@ -12,5 +12,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Analysis" Version="0.19.1" />
     <PackageReference Include="Microsoft.ML" Version="1.7.1" />
+    <PackageReference Include="TestNative" Version="0.0.1" />
   </ItemGroup>
 </Project>
