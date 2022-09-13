@@ -12,7 +12,12 @@ namespace XGBoostProto
     /// Wrapper of the c interfaces of XGBoost
     /// Refer to https://xgboost.readthedocs.io/en/stable/tutorials/c_api_tutorial.html to get the details.
     /// </summary>
-    internal static class WrappedXGBoostInterface
+    #if false
+    internal
+    #else
+    public
+    #endif
+    static class WrappedXGBoostInterface
     {
 #if false
         public enum CApiDType : int
@@ -31,7 +36,15 @@ namespace XGBoostProto
         }
 #endif
 
+#if false
         private const string DllName = "xgboost";
+#else
+        //private const string DllName = "/home/rgesteve/projects/xgboost/build/install/lib/libxgboost.so";
+        private const string DllName = "/data/projects/xgboost/build_docker/install/lib/libxgboost.so";
+#endif
+
+	[DllImport(DllName)]
+        public static extern void XGBoostVersion(out int major, out int minor, out int patch);
 
         #region Error API 
 
