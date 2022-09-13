@@ -77,12 +77,18 @@ namespace XGBoostProto
 	public static extern int XGDMatrixFree(IntPtr handle);
 
 	[DllImport(DllName)]
+	public static extern int XGDMatrixNumRow(SafeDMatrixHandle handle, out ulong nrows);
+
+	[DllImport(DllName)]
+	public static extern int XGDMatrixNumCol(SafeDMatrixHandle handle, out ulong ncols);
+
+	[DllImport(DllName)]
     	public static extern int XGDMatrixGetFloatInfo(SafeDMatrixHandle handle, string field, 
                                                        out ulong len, out IntPtr result);
 
         [DllImport(DllName)]
 	public static extern int XGDMatrixSetFloatInfo(SafeDMatrixHandle handle, string field,
-                                                   float[] array, ulong len);
+                                                   IntPtr array, ulong len);
         #endregion
 
 

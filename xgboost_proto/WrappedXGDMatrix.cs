@@ -6,18 +6,36 @@ namespace XGBoostProto
     /// <summary>
     /// Wrapper of DMatrix object of XGBoost
     /// </summary>
-    internal sealed class DMatrix : IDisposable
+    #if false
+    internal
+    #else
+    public
+    #endif
+    sealed class DMatrix : IDisposable
     {
 
         private WrappedXGBoostInterface.SafeDMatrixHandle _handle;
         public WrappedXGBoostInterface.SafeDMatrixHandle Handle => _handle;
+	private const float Missing = 0f;
 
         /// <summary>
         /// Create a <see cref="DMatrix"/> for storing training and prediction data under XGBoost framework.
 #if true
-        public unsafe DMatrix(double[] data, float[] labels = null)
+        public unsafe DMatrix(float[] data, uint nrows, uint ncols, float[] labels = null)
 	{
 	  _handle = null;
+
+	  int errp = WrappedXGBoostInterface.XGDMatrixCreateFromMat(data, nrows, ncols, Missing, out _handle);
+	  if (errp == -1)
+	  {
+	      string reason = WrappedXGBoostInterface.XGBGetLastError();
+              throw new XGBoostDLLException(reason);
+	  }
+
+          if (labels != null) {
+	    SetLabel(labels);
+	  }
+
 	}
 #else
         public unsafe Dataset(double[][] sampleValuePerColumn,
@@ -86,37 +104,47 @@ namespace XGBoostProto
         }
 #endif
 
-        public void Dispose()
-        {
-            _handle?.Dispose();
-            _handle = null;
-        }
+	public ulong GetNumRows()
+	{
+	  ulong numRows;
+	  int errp = WrappedXGBoostInterface.XGDMatrixNumRow(_handle, out numRows);
+	  if (errp == -1) {
+	      string reason = WrappedXGBoostInterface.XGBGetLastError();
+              throw new XGBoostDLLException(reason);	  
+	  }
+	  return numRows;
+	}
 
-#if false
-        public int GetNumRows()
-        {
-            int res = 0;
-            LightGbmInterfaceUtils.Check(WrappedLightGbmInterface.DatasetGetNumData(_handle, ref res));
-            return res;
-        }
-
-        public int GetNumCols()
-        {
-            int res = 0;
-            LightGbmInterfaceUtils.Check(WrappedLightGbmInterface.DatasetGetNumFeature(_handle, ref res));
-            return res;
-        }
-#endif
+	public ulong GetNumCols()
+	{
+	  ulong numCols;
+	  int errp = WrappedXGBoostInterface.XGDMatrixNumCol(_handle, out numCols);
+	  if (errp == -1) {
+	      string reason = WrappedXGBoostInterface.XGBGetLastError();
+              throw new XGBoostDLLException(reason);	  
+	  }
+	  return numCols;
+	}
 
         public unsafe void SetLabel(float[] labels)
         {
 	#if false
             Contracts.AssertValue(labels);
             Contracts.Assert(labels.Length == GetNumRows());
-            fixed (float* ptr = labels)
-                LightGbmInterfaceUtils.Check(WrappedLightGbmInterface.DatasetSetField(_handle, "label", (IntPtr)ptr, labels.Length,
-                    WrappedLightGbmInterface.CApiDType.Float32));
-#endif
+	    #endif
+            fixed (float* ptr = labels) {
+	    	  int errp = WrappedXGBoostInterface.XGDMatrixSetFloatInfo(_handle, "label", (IntPtr)ptr, (ulong)labels.Length);
+	  	  if (errp == -1) {
+		    string reason = WrappedXGBoostInterface.XGBGetLastError();
+		    throw new XGBoostDLLException(reason);	  
+		  }
+	    }
+        }
+
+        public void Dispose()
+        {
+            _handle?.Dispose();
+            _handle = null;
         }
     }
 }
