@@ -195,7 +195,6 @@ namespace XGBoostProto
             }
             return strBuf.ToString();
         }
-#endif
 
         /// <summary>
         /// Convert the pointer of c string to c# string.
@@ -204,5 +203,6 @@ namespace XGBoostProto
         {
             return Marshal.PtrToStringAnsi(src);
         }
+	#endif
     }
 }

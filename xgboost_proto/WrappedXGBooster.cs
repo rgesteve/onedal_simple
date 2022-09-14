@@ -27,8 +27,6 @@ namespace XGBoostProto
 
         public Booster(DMatrix trainDMatrix)
 	{
-	  _handle = null;
-
 	  var dmats = new [] { trainDMatrix.Handle };
 	  var len = unchecked((ulong)dmats.Length);
  	  var errp = WrappedXGBoostInterface.XGBoosterCreate(dmats, len, out _handle);
@@ -40,15 +38,14 @@ namespace XGBoostProto
 	}
 	
 
-        public bool Update()
+        public void Update(DMatrix train, int iter)
         {
-	#if false
-            int isFinished = 0;
-            LightGbmInterfaceUtils.Check(WrappedLightGbmInterface.BoosterUpdateOneIter(Handle, ref isFinished));
-            return isFinished == 1;
-	    #else
-	    return false;
-	    #endif
+	   var errp = WrappedXGBoostInterface.XGBoosterUpdateOneIter(_handle, iter, train.Handle);
+	   if (errp == -1)
+	   {
+  	      string reason = WrappedXGBoostInterface.XGBGetLastError();
+              throw new XGBoostDLLException(reason);
+	   }
         }
 
 #if false
@@ -288,7 +285,7 @@ namespace XGBoostProto
         public void Dispose()
         {
             _handle?.Dispose();
-            _handle = null;
+//            _handle = null;
         }
         #endregion
     }

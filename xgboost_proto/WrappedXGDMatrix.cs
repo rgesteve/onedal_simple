@@ -21,10 +21,8 @@ namespace XGBoostProto
         /// <summary>
         /// Create a <see cref="DMatrix"/> for storing training and prediction data under XGBoost framework.
 #if true
-        public unsafe DMatrix(float[] data, uint nrows, uint ncols, float[] labels = null)
+        public unsafe DMatrix(float[] data, uint nrows, uint ncols, float[]? labels = null)
 	{
-	  _handle = null;
-
 	  int errp = WrappedXGBoostInterface.XGDMatrixCreateFromMat(data, nrows, ncols, Missing, out _handle);
 	  if (errp == -1)
 	  {
@@ -144,7 +142,7 @@ namespace XGBoostProto
         public void Dispose()
         {
             _handle?.Dispose();
-            _handle = null;
+//            _handle = null;
         }
     }
 }
