@@ -28,6 +28,16 @@ public class SanityTest
 	Assert.True(m.GetNumCols() == cols);
     }
 
+    [Theory]
+    [InlineData(10, 20)]
+    [InlineData(2, 3)]
+    public void TestingTheory(int a, int b)
+    { 
+      Console.WriteLine($"***** The values are {a}, {b}.");
+      int c = a * b;
+      Assert.Equal(c, a * b); 
+    }
+
     [Fact(Skip = "Just trying out skip functionality")]
     public void TestTest()
     {
