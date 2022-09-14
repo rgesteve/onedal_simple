@@ -5,15 +5,7 @@ using System.Text;
 
 namespace XGBoostProto
 {
-
-    public static class Test
-    {
-	public static bool IsReady()
-	{
-	   return true;
-	}
-    }
-
+#if false
     public class XGBoostDLLException : Exception
     {
 	public XGBoostDLLException()
@@ -49,6 +41,7 @@ namespace XGBoostProto
 	  };
 	}
     }
+    #endif
     
 #if false
     /// <summary>

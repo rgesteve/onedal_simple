@@ -15,38 +15,43 @@ namespace XGBoostProto
         private readonly bool _hasValid;
         private readonly bool _hasMetric;
 #endif
+	WrappedXGBoostInterface.SafeBoosterHandle _handle;
 
-        public WrappedXGBoostInterface.SafeBoosterHandle Handle { get; private set; }
+        public WrappedXGBoostInterface.SafeBoosterHandle Handle {
+         get { return _handle; }
+	 /* private set; */
+	}
 #if false
         public int BestIteration { get; set; }
+#endif
 
-        public Booster(Dictionary<string, object> parameters, Dataset trainset, Dataset validset = null)
-        {
-            var param = LightGbmInterfaceUtils.JoinParameters(parameters);
-            LightGbmInterfaceUtils.Check(WrappedLightGbmInterface.BoosterCreate(trainset.Handle, param, out var handle));
-            Handle = handle;
-            if (validset != null)
-            {
-                LightGbmInterfaceUtils.Check(WrappedLightGbmInterface.BoosterAddValidData(Handle, validset.Handle));
-                _hasValid = true;
-            }
+        public Booster(DMatrix trainDMatrix)
+	{
+	  _handle = null;
 
-            int numEval = 0;
-            BestIteration = -1;
-            LightGbmInterfaceUtils.Check(WrappedLightGbmInterface.BoosterGetEvalCounts(Handle, ref numEval));
-            // At most one metric in ML.NET.
-            Contracts.Assert(numEval <= 1);
-            if (numEval == 1)
-                _hasMetric = true;
-        }
+	  var dmats = new [] { trainDMatrix.Handle };
+	  var len = unchecked((ulong)dmats.Length);
+ 	  var errp = WrappedXGBoostInterface.XGBoosterCreate(dmats, len, out _handle);
+	  if (errp == -1)
+	  {
+  	      string reason = WrappedXGBoostInterface.XGBGetLastError();
+              throw new XGBoostDLLException(reason);
+	  }
+	}
+	
 
         public bool Update()
         {
+	#if false
             int isFinished = 0;
             LightGbmInterfaceUtils.Check(WrappedLightGbmInterface.BoosterUpdateOneIter(Handle, ref isFinished));
             return isFinished == 1;
+	    #else
+	    return false;
+	    #endif
         }
 
+#if false
         public double EvalTrain()
         {
             return Eval(0);
@@ -282,8 +287,8 @@ namespace XGBoostProto
         #region IDisposable Support
         public void Dispose()
         {
-            Handle?.Dispose();
-            Handle = null;
+            _handle?.Dispose();
+            _handle = null;
         }
         #endregion
     }

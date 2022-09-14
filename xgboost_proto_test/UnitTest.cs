@@ -1,4 +1,5 @@
 using XGBoostProto;
+using xgboost_proto_test_support;
 
 namespace xgboost_proto_test;
 
@@ -26,4 +27,18 @@ public class SanityTest
 	Assert.True(m.GetNumRows() == rows);
 	Assert.True(m.GetNumCols() == cols);
     }
+
+    [Fact(Skip = "Just trying out skip functionality")]
+    public void TestTest()
+    {
+       Assert.False(true);
+    }
+
+//    [Fact]
+    [NotArm32Fact("This test is disabled on ARM")]
+    public void TestAttribute()
+    {
+       Assert.False(true);
+    }
+
 }
