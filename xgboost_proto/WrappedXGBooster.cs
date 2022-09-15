@@ -94,98 +94,9 @@ namespace XGBoostProto
             fixed (byte* ptr = content)
                 return LightGbmInterfaceUtils.GetString((IntPtr)ptr);
         }
+#endif
 
-        private static double[] Str2DoubleArray(string str, char delimiter)
-        {
-            var values = new List<double>();
-            foreach (var token in str.Split(delimiter))
-            {
-                var trimmed = token.Trim().ToLowerInvariant();
-
-                if (trimmed.Contains("-inf"))
-                    values.Add(double.NegativeInfinity);
-                else if (trimmed.Contains("inf"))
-                    values.Add(double.PositiveInfinity);
-                else if (trimmed.Contains("nan"))
-                    values.Add(double.NaN);
-                else
-                    // The value carried in the trimmed string is not inf, -inf, or nan.
-                    // Therefore, double.Parse should be able to generate a valid number from it.
-                    // If parsing fails, an exception will be thrown.
-                    values.Add(double.Parse(trimmed, CultureInfo.InvariantCulture));
-            }
-            return values.ToArray();
-        }
-
-        private static int[] Str2IntArray(string str, char delimiter)
-        {
-            return str.Split(delimiter).Select(x => int.Parse(x, CultureInfo.InvariantCulture)).ToArray();
-        }
-
-        private static UInt32[] Str2UIntArray(string str, char delimiter)
-        {
-            return str.Split(delimiter).Select(x => UInt32.Parse(x, CultureInfo.InvariantCulture)).ToArray();
-        }
-
-        private static bool GetIsDefaultLeft(UInt32 decisionType)
-        {
-            // The second bit.
-            return (decisionType & 2) > 0;
-        }
-
-        private static bool GetIsCategoricalSplit(UInt32 decisionType)
-        {
-            // The first bit.
-            return (decisionType & 1) > 0;
-        }
-
-        private static bool GetHasMissing(UInt32 decisionType)
-        {
-            // The 3rd and 4th bits.
-            return ((decisionType >> 2) & 3) > 0;
-        }
-
-        private static double[] GetDefalutValue(double[] threshold, UInt32[] decisionType)
-        {
-            double[] ret = new double[threshold.Length];
-            for (int i = 0; i < threshold.Length; ++i)
-            {
-                if (GetHasMissing(decisionType[i]) && !GetIsCategoricalSplit(decisionType[i]))
-                {
-                    if (GetIsDefaultLeft(decisionType[i]))
-                        ret[i] = threshold[i];
-                    else
-                        ret[i] = threshold[i] + 1;
-                }
-            }
-            return ret;
-        }
-
-        private static bool FindInBitset(UInt32[] bits, int start, int end, int pos)
-        {
-            int i1 = pos / 32;
-            if (start + i1 >= end)
-                return false;
-            int i2 = pos % 32;
-            return ((bits[start + i1] >> i2) & 1) > 0;
-        }
-
-        private static int[] GetCatThresholds(UInt32[] catThreshold, int lowerBound, int upperBound)
-        {
-            List<int> cats = new List<int>();
-            for (int j = lowerBound; j < upperBound; ++j)
-            {
-                // 32 bits.
-                for (int k = 0; k < 32; ++k)
-                {
-                    int cat = (j - lowerBound) * 32 + k;
-                    if (FindInBitset(catThreshold, lowerBound, upperBound, cat))
-                        cats.Add(cat);
-                }
-            }
-            return cats.ToArray();
-        }
-
+#if false
         public InternalTreeEnsemble GetModel(int[] categoricalFeatureBoudaries)
         {
             InternalTreeEnsemble res = new InternalTreeEnsemble();
@@ -285,7 +196,9 @@ namespace XGBoostProto
         public void Dispose()
         {
             _handle?.Dispose();
-//            _handle = null;
+#pragma warning disable CS8625
+            _handle = null;
+#pragma warning restore CS8625
         }
         #endregion
     }

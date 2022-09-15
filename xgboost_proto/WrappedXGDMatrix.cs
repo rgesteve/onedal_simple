@@ -142,7 +142,10 @@ namespace XGBoostProto
         public void Dispose()
         {
             _handle?.Dispose();
-//            _handle = null;
+#pragma warning disable CS8625
+            _handle = null;
+#pragma warning restore CS8625
+
         }
     }
 }
