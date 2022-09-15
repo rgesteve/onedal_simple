@@ -9,3 +9,5 @@ bin/
 build/
 output.txt
 *.nupkg
+.vs/
+
