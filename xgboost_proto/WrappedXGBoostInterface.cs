@@ -19,22 +19,6 @@ namespace XGBoostProto
     #endif
     static class WrappedXGBoostInterface
     {
-#if false
-        public enum CApiDType : int
-        {
-            Float32 = 0,
-            Float64 = 1,
-            Int32 = 2,
-            Int64 = 3
-        }
-
-        public enum CApiPredictType : int
-        {
-            Normal = 0,
-            Raw = 1,
-            LeafIndex = 2,
-        }
-#endif
 
 #if false
         private const string DllName = "xgboost";
@@ -55,97 +39,74 @@ namespace XGBoostProto
 
         #region DMatrix API 
 
-        public sealed class SafeDMatrixHandle : SafeHandleZeroOrMinusOneIsInvalid
-        {
-            private SafeDMatrixHandle()
-                : base(true)
-            {
-            }
-
-            protected override bool ReleaseHandle()
-            {
-                XGBoostInterfaceUtils.Check(XGDMatrixFree(handle));
-                return true;
-            }
-        }
-
     	[DllImport(DllName)]
 	public static extern int XGDMatrixCreateFromMat(float[] data, ulong nrow, ulong ncol, 
-                                                    float missing, out SafeDMatrixHandle handle);
+                                                    float missing, out IntPtr handle);
 
 	[DllImport(DllName)]
 	public static extern int XGDMatrixFree(IntPtr handle);
 
 	[DllImport(DllName)]
-	public static extern int XGDMatrixNumRow(SafeDMatrixHandle handle, out ulong nrows);
+	public static extern int XGDMatrixNumRow(IntPtr handle, out ulong nrows);
 
 	[DllImport(DllName)]
-	public static extern int XGDMatrixNumCol(SafeDMatrixHandle handle, out ulong ncols);
+	public static extern int XGDMatrixNumCol(IntPtr handle, out ulong ncols);
 
 	[DllImport(DllName)]
-    	public static extern int XGDMatrixGetFloatInfo(SafeDMatrixHandle handle, string field, 
+    	public static extern int XGDMatrixGetFloatInfo(IntPtr handle, string field, 
                                                        out ulong len, out IntPtr result);
 
         [DllImport(DllName)]
-	public static extern int XGDMatrixSetFloatInfo(SafeDMatrixHandle handle, string field,
+	public static extern int XGDMatrixSetFloatInfo(IntPtr handle, string field,
                                                    IntPtr array, ulong len);
         #endregion
 
 
         #region API Booster
 
-        public sealed class SafeBoosterHandle : SafeHandleZeroOrMinusOneIsInvalid
-        {
-            private SafeBoosterHandle()
-                : base(true)
-            {
-            }
-
-            protected override bool ReleaseHandle()
-            {
-                XGBoostInterfaceUtils.Check(XGBoosterFree(handle));
-                return true;
-            }
-        }
-
 	[DllImport(DllName)]
-	public static extern int XGBoosterCreate(SafeDMatrixHandle[] dmats, 
-                                             ulong len, out SafeBoosterHandle handle);
+	public static extern int XGBoosterCreate(IntPtr[] dmats, 
+                                             ulong len, out IntPtr handle);
 
 	[DllImport(DllName)]
 	public static extern int XGBoosterFree(IntPtr handle);
+
+	[DllImport(DllName)]
+	public static extern int XGBoosterSetParam(IntPtr handle, string name, string val);
 
         #endregion
 
 
         #region API train
 	[DllImport(DllName)]
-	public static extern int XGBoosterUpdateOneIter(SafeBoosterHandle bHandle, int iter, 
-                                                        SafeDMatrixHandle dHandle);
+	public static extern int XGBoosterUpdateOneIter(IntPtr bHandle, int iter, 
+                                                        IntPtr dHandle);
 
-#if false
-        [DllImport(DllName, EntryPoint = "LGBM_BoosterGetEvalCounts", CallingConvention = CallingConvention.StdCall)]
-        public static extern int BoosterGetEvalCounts(SafeBoosterHandle handle, ref int outLen);
-
-        [DllImport(DllName, EntryPoint = "LGBM_BoosterGetEval", CallingConvention = CallingConvention.StdCall)]
-        public static extern unsafe int BoosterGetEval(SafeBoosterHandle handle, int dataIdx,
-                                 ref int outLen, double* outResult);
-#endif
+        [DllImport(DllName)]
+        public static extern int XGBoosterEvalOneIter();
         #endregion
 
         #region API predict
 	[DllImport(DllName)]
-	public static extern int XGBoosterPredict(SafeBoosterHandle bHandle, SafeDMatrixHandle dHandle, 
-                                              int optionMask, int ntreeLimit, 
+	public static extern int XGBoosterPredict(IntPtr bHandle, IntPtr dHandle, 
+                                              int optionMask, int ntreeLimit, int training,
                                               out ulong predsLen, out IntPtr predsPtr);
         #endregion
+
+	#region API serialization
+    	[DllImport(DllName)]
+	public static extern int XGBoosterDumpModel(IntPtr handle, string fmap, int with_stats, out int out_len, out IntPtr dumpStr);
+
+	[DllImport(DllName)]
+	public static extern int XGBoosterDumpModelEx(IntPtr handle, string fmap, int with_stats, string format, out int out_len, out IntPtr dumpStr);
+	#endregion
 
     }
 
     internal static class XGBoostInterfaceUtils
     {
         /// <summary>
-        /// Checks if LightGBM has a pending error message. Raises an exception in that case.
+        /// Checks if XGBoost has a pending error message. Raises an exception in that case.
         /// </summary>
         public static void Check(int res)
         {
@@ -204,5 +165,21 @@ namespace XGBoostProto
             return Marshal.PtrToStringAnsi(src);
         }
 	#endif
+
+    public static float[] GetPredictionsArray(IntPtr predsPtr, ulong predsLen)
+    {
+      var length = unchecked((int)predsLen);
+      var preds = new float[length];
+      for (var i = 0; i < length; i++)
+      {
+        var floatBytes = new byte[4];
+        for (var b = 0; b < 4; b++)
+        {
+          floatBytes[b] = Marshal.ReadByte(predsPtr, 4*i + b);
+        }
+        preds[i] = BitConverter.ToSingle(floatBytes, 0);
+      }
+      return preds;
+    }
     }
 }
