@@ -8,22 +8,35 @@ namespace XGBoostProto
     /// <summary>
     /// Wrapper of Booster object of XGBoost.
     /// </summary>
-    internal sealed class Booster : IDisposable
+    #if false
+    internal
+    #else
+    public
+    #endif
+    class Booster : IDisposable
     {
 
-#if false
-        private readonly bool _hasValid;
-        private readonly bool _hasMetric;
-#endif
-	WrappedXGBoostInterface.SafeBoosterHandle _handle;
+	private bool disposed;
+	private readonly IntPtr _handle;
+	private const int normalPrediction = 0; // Value for the optionMask in prediction
+#pragma warning disable CS0414
+	private int numClass = 1;
+#pragma warning restore CS0414
 
-        public WrappedXGBoostInterface.SafeBoosterHandle Handle {
-         get { return _handle; }
-	 /* private set; */
+	public IntPtr Handle => _handle;
+
+        public Booster(Dictionary<string, object> parameters, DMatrix trainDMatrix)
+	{
+	  var dmats = new [] { trainDMatrix.Handle };
+	  var len = unchecked((ulong)dmats.Length);
+ 	  var errp = WrappedXGBoostInterface.XGBoosterCreate(dmats, len, out _handle);
+	  if (errp == -1)
+	  {
+  	      string reason = WrappedXGBoostInterface.XGBGetLastError();
+              throw new XGBoostDLLException(reason);
+	  }
+	  SetParameters(parameters);
 	}
-#if false
-        public int BestIteration { get; set; }
-#endif
 
         public Booster(DMatrix trainDMatrix)
 	{
@@ -36,7 +49,6 @@ namespace XGBoostProto
               throw new XGBoostDLLException(reason);
 	  }
 	}
-	
 
         public void Update(DMatrix train, int iter)
         {
@@ -49,6 +61,7 @@ namespace XGBoostProto
         }
 
 #if false
+// Should expose this interface for XGBoosterEvalOneIter
         public double EvalTrain()
         {
             return Eval(0);
@@ -68,11 +81,41 @@ namespace XGBoostProto
                 return double.NaN;
             int outLen = 0;
             double[] res = new double[1];
-            fixed (double* ptr = res)
-                LightGbmInterfaceUtils.Check(WrappedLightGbmInterface.BoosterGetEval(Handle, dataIdx, ref outLen, ptr));
+            fixed (double* ptr = res) {
+    	        var errp = WrappedXGBoostInterface.XGBoosterEvalOneIter(_handle, iter, train.Handle, ptr); //FIXME
+                // Handle, dataIdx, ref outLen, ptr));
+	    }
             return res[0];
         }
+#endif
 
+#if false
+    public float[] Predict(DMatrix test)
+    {
+      ulong predsLen;
+      IntPtr predsPtr;
+/*
+allowed values of optionmask:
+         0:normal prediction
+         1:output margin instead of transformed value
+         2:output leaf index of trees instead of leaf value, note leaf index is unique per tree
+         4:output feature contributions to individual predictions
+
+// using `0` for ntreeLimit means use all the trees
+*/
+
+      var errp = WrappedXGBoostInterface.XGBoosterPredict(_handle, test.Handle, 0, 0, out predsLen, out predsPtr);
+	if (errp == -1)
+	{
+  	   string reason = WrappedXGBoostInterface.XGBGetLastError();
+           throw new XGBoostDLLException(reason);
+	}
+      return XGBoostInterfaceUtils.GetPredictionsArray(predsPtr, predsLen);
+    }
+#endif
+
+#if false
+	// Should enable XGBoosterSaveModelToBuffer
         [BestFriend]
         internal unsafe string GetModelString()
         {
@@ -96,110 +139,76 @@ namespace XGBoostProto
         }
 #endif
 
-#if false
-        public InternalTreeEnsemble GetModel(int[] categoricalFeatureBoudaries)
-        {
-            InternalTreeEnsemble res = new InternalTreeEnsemble();
-            string modelString = GetModelString();
-            string[] lines = modelString.Split('\n');
-            int i = 0;
-            for (; i < lines.Length;)
-            {
-                if (lines[i].StartsWith("Tree="))
-                {
-                    Dictionary<string, string> kvPairs = new Dictionary<string, string>();
-                    ++i;
-                    while (!lines[i].StartsWith("Tree=") && lines[i].Trim().Length != 0)
-                    {
-                        string[] kv = lines[i].Split('=');
-                        Contracts.Check(kv.Length == 2);
-                        kvPairs[kv[0].Trim()] = kv[1].Trim();
-                        ++i;
-                    }
-                    int numberOfLeaves = int.Parse(kvPairs["num_leaves"], CultureInfo.InvariantCulture);
-                    int numCat = int.Parse(kvPairs["num_cat"], CultureInfo.InvariantCulture);
-                    if (numberOfLeaves > 1)
-                    {
-                        var leftChild = Str2IntArray(kvPairs["left_child"], ' ');
-                        var rightChild = Str2IntArray(kvPairs["right_child"], ' ');
-                        var splitFeature = Str2IntArray(kvPairs["split_feature"], ' ');
-                        var threshold = Str2DoubleArray(kvPairs["threshold"], ' ');
-                        var splitGain = Str2DoubleArray(kvPairs["split_gain"], ' ');
-                        var leafOutput = Str2DoubleArray(kvPairs["leaf_value"], ' ');
-                        var decisionType = Str2UIntArray(kvPairs["decision_type"], ' ');
-                        var defaultValue = GetDefalutValue(threshold, decisionType);
-                        var categoricalSplitFeatures = new int[numberOfLeaves - 1][];
-                        var categoricalSplit = new bool[numberOfLeaves - 1];
-                        if (categoricalFeatureBoudaries != null)
-                        {
-                            // Add offsets to split features.
-                            for (int node = 0; node < numberOfLeaves - 1; ++node)
-                                splitFeature[node] = categoricalFeatureBoudaries[splitFeature[node]];
-                        }
+    public void SetParameters(Dictionary<string, object> parameters)
+    {
+    #if false
+      // support internationalisation i.e. support floats with commas (e.g. 0,5F)
+      var nfi = new NumberFormatInfo { NumberDecimalSeparator = "." };
 
-                        if (numCat > 0)
-                        {
-                            var catBoundaries = Str2IntArray(kvPairs["cat_boundaries"], ' ');
-                            var catThreshold = Str2UIntArray(kvPairs["cat_threshold"], ' ');
-                            for (int node = 0; node < numberOfLeaves - 1; ++node)
-                            {
-                                if (GetIsCategoricalSplit(decisionType[node]))
-                                {
-                                    int catIdx = (int)threshold[node];
-                                    var cats = GetCatThresholds(catThreshold, catBoundaries[catIdx], catBoundaries[catIdx + 1]);
-                                    categoricalSplitFeatures[node] = new int[cats.Length];
-                                    // Convert Cat thresholds to feature indices.
-                                    for (int j = 0; j < cats.Length; ++j)
-                                        categoricalSplitFeatures[node][j] = splitFeature[node] + cats[j];
+      SetParameter("max_depth", ((int)parameters["max_depth"]).ToString());
+      SetParameter("learning_rate", ((float)parameters["learning_rate"]).ToString(nfi));
+      SetParameter("n_estimators", ((int)parameters["n_estimators"]).ToString());
+      SetParameter("silent", ((bool)parameters["silent"]).ToString());
+      SetParameter("objective", (string)parameters["objective"]);
+      SetParameter("booster", (string)parameters["booster"]);
+      SetParameter("tree_method", (string)parameters["tree_method"]);
 
-                                    splitFeature[node] = -1;
-                                    categoricalSplit[node] = true;
-                                    // Swap left and right child.
-                                    int t = leftChild[node];
-                                    leftChild[node] = rightChild[node];
-                                    rightChild[node] = t;
-                                }
-                                else
-                                {
-                                    categoricalSplit[node] = false;
-                                }
-                            }
-                        }
-                        InternalRegressionTree tree = InternalRegressionTree.Create(numberOfLeaves, splitFeature, splitGain,
-                            threshold.Select(x => (float)(x)).ToArray(), defaultValue.Select(x => (float)(x)).ToArray(), leftChild, rightChild, leafOutput,
-                            categoricalSplitFeatures, categoricalSplit);
-                        res.AddTree(tree);
-                    }
-                    else
-                    {
-                        InternalRegressionTree tree = new InternalRegressionTree(2);
-                        var leafOutput = Str2DoubleArray(kvPairs["leaf_value"], ' ');
-                        if (leafOutput[0] != 0)
-                        {
-                            // Convert Constant tree to Two-leaf tree, avoid being filter by TLC.
-                            var categoricalSplitFeatures = new int[1][];
-                            var categoricalSplit = new bool[1];
-                            tree = InternalRegressionTree.Create(2, new int[] { 0 }, new double[] { 0 },
-                                new float[] { 0 }, new float[] { 0 }, new int[] { -1 }, new int[] { -2 }, new double[] { leafOutput[0], leafOutput[0] },
-                                categoricalSplitFeatures, categoricalSplit);
-                        }
-                        res.AddTree(tree);
-                    }
-                }
-                else
-                    ++i;
-            }
-            return res;
-        }
-#endif
-        #region IDisposable Support
+      SetParameter("nthread", ((int)parameters["nthread"]).ToString());
+      SetParameter("gamma", ((float)parameters["gamma"]).ToString(nfi));
+      SetParameter("min_child_weight", ((int)parameters["min_child_weight"]).ToString());
+      SetParameter("max_delta_step", ((int)parameters["max_delta_step"]).ToString());
+      SetParameter("subsample", ((float)parameters["subsample"]).ToString(nfi));
+      SetParameter("colsample_bytree", ((float)parameters["colsample_bytree"]).ToString(nfi));
+      SetParameter("colsample_bylevel", ((float)parameters["colsample_bylevel"]).ToString(nfi));
+      SetParameter("reg_alpha", ((float)parameters["reg_alpha"]).ToString(nfi));
+      SetParameter("reg_lambda", ((float)parameters["reg_lambda"]).ToString(nfi));
+      SetParameter("scale_pos_weight", ((float)parameters["scale_pos_weight"]).ToString(nfi));
+
+      SetParameter("base_score", ((float)parameters["base_score"]).ToString(nfi));
+      SetParameter("seed", ((int)parameters["seed"]).ToString());
+      SetParameter("missing", ((float)parameters["missing"]).ToString(nfi));
+      
+      SetParameter("sample_type", (string)parameters["sample_type"]);
+      SetParameter("normalize_type ", (string)parameters["normalize_type"]);
+      SetParameter("rate_drop", ((float)parameters["rate_drop"]).ToString(nfi));
+      SetParameter("one_drop", ((int)parameters["one_drop"]).ToString());
+      SetParameter("skip_drop", ((float)parameters["skip_drop"]).ToString(nfi));
+
+      if (parameters.TryGetValue("num_class",out var value))
+      {
+          numClass = (int)value;
+          SetParameter("num_class", numClass.ToString());
+      }
+      #endif
+    }
+
+    public void SetParameter(string name, string val)
+    {
+ 	  var errp = WrappedXGBoostInterface.XGBoosterSetParam(_handle, name, val);
+
+	  if (errp == -1)
+	  {
+  	      string reason = WrappedXGBoostInterface.XGBGetLastError();
+              throw new XGBoostDLLException(reason);
+	  }
+    }
+
+	#region IDisposable Support
         public void Dispose()
         {
-            _handle?.Dispose();
-#pragma warning disable CS8625
-            _handle = null;
-#pragma warning restore CS8625
+	  Dispose(true);
+	  GC.SuppressFinalize(this);
         }
+
+	protected virtual void Dispose(bool disposing)
+	{
+	  if (disposed)
+	  {
+	    return;
+	  }
+	  WrappedXGBoostInterface.XGBoosterFree(_handle);
+	  disposed = true;
+	}
         #endregion
     }
 }

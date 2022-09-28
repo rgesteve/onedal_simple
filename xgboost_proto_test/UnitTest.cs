@@ -1,6 +1,8 @@
 using XGBoostProto;
 using xgboost_proto_test_support;
 
+using System.IO;
+
 namespace xgboost_proto_test;
 
 public class SanityTest
@@ -10,6 +12,12 @@ public class SanityTest
     {
        var ver = XGBoost.Version();
        Assert.True(ver.Major >= 2);
+    }
+
+    [Fact]
+    public void TestDataPath()
+    {
+      Assert.True(Directory.Exists(TestUtils.GetDataPath()));
     }
 
     [Fact]
@@ -26,6 +34,7 @@ public class SanityTest
 	Assert.True(labels.Length == rows);
 	Assert.True(m.GetNumRows() == rows);
 	Assert.True(m.GetNumCols() == cols);
+	Booster bst = new Booster(m);
     }
 
     [Theory]
