@@ -20,6 +20,8 @@ install (
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 
-set(CPACK_GENERATOR "ZIP")
+#set(CPACK_GENERATOR "ZIP")
+set(CPACK_GENERATOR "NuGet")
+set(CPACK_NUGET_PACKAGE_TAGS "nuget" "native")
 include(CPack)
 
