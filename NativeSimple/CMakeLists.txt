@@ -19,3 +19,7 @@ install (
     DIRECTORY include/
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
+
+set(CPACK_GENERATOR "ZIP")
+include(CPack)
+
