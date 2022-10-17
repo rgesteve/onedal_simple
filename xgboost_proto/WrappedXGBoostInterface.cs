@@ -40,7 +40,7 @@ namespace XGBoostProto
         private const string DllName = "xgboost";
 #else
         //private const string DllName = "/home/rgesteve/projects/xgboost/build/install/lib/libxgboost.so";
-        private const string DllName = "/data/projects/xgboost/build_docker/install/lib/libxgboost.so";
+        private const string DllName =  @"C:\Users\perf\projects\xgboost\build\install\bin\xgboost.dll";
 #endif
 
 	[DllImport(DllName)]
