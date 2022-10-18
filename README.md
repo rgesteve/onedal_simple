@@ -38,6 +38,13 @@ You can use the provided script "build.ps1", in which case, please call it from 
 ```cmd
 %ProgramFiles(x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\Launch-VsDevShell.ps1
 ```
+If you're not sure where VS is installed, or you have several installations, you can manage which one to use with the `vswhere` command line (think of something similar to `xcode-select` on macOS), which you can install via `winget`:
+```pwsh
+> winget install vswhere
+> $VSPath = $(vswhere -latest -property installationPath)
+> $VSLaunch = $VSPath + "\Common7\Tools\Launch-VsDevShell.ps1"
+> & $VSLaunch
+```
 
 ## OneDALStandalone
 
