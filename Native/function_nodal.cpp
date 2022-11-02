@@ -8,28 +8,7 @@
 #endif
 #include <cstring>
 
-#ifdef WINDOWS
-#include <Windows.h>
-
-#define DLL_EXPORT __declspec(dllexport)
-
-#ifndef STDMETHODCALLTYPE
-#define STDMETHODCALLTYPE __stdcall
-#endif
-
-#else // !WINDOWS
-
-#ifndef STDMETHODCALLTYPE
-#define STDMETHODCALLTYPE
-#endif
-
-#if __GNUC__ >= 4
-#define DLL_EXPORT __attribute__ ((visibility ("default")))
-#else
-#define DLL_EXPORT
-#endif
-
-#endif
+#include "function_nodal.h"
 
 #if 0
 struct error_data
@@ -115,17 +94,17 @@ extern "C" DLL_EXPORT error_data* STDMETHODCALLTYPE GetErrors(int* codes, int le
     return ret;
 }
 #else
-extern "C" DLL_EXPORT int STDMETHODCALLTYPE sumi(int a, int b)
+int STDMETHODCALLTYPE sumi(int a, int b)
 {
     return a + b;
 }
 
-extern "C" DLL_EXPORT void STDMETHODCALLTYPE sumouti(int a, int b, int* c)
+void STDMETHODCALLTYPE sumouti(int a, int b, int* c)
 {
     *c = a + b;
 }
 
-extern "C" DLL_EXPORT void STDMETHODCALLTYPE sumrefi(int a, int* b)
+void STDMETHODCALLTYPE sumrefi(int a, int* b)
 {
     *b += a;
 }

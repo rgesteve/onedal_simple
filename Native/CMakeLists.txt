@@ -5,7 +5,7 @@ project(OneDALNative)
 option(WITH_ONEDAL "Build with oneDAL" ON)
 
 if(WITH_ONEDAL)
-    message(STATUS "oneDAL is specified, building the OneDAL.")
+    message(STATUS "*** oneDAL is specified, building the OneDAL.")
     set(USE_DPCPP no)
     find_package(oneDAL CONFIG REQUIRED)
 
@@ -33,6 +33,13 @@ if(WITH_ONEDAL)
     ##target_include_directories(OneDALNative ${oneDAL_INCLUDE_DIRS})
     ##target_link_libraries(OneDALNative ${oneDAL_IMPORTED_TARGETS})
 else()
-    message(STATUS "oneDAL is not specified, building a OneDAL-free version.")
+    message(STATUS "**** oneDAL is not specified, building a OneDAL-free version.")
     add_library(OneDALNative_lib SHARED function_nodal.cpp)
+    # Windows wants to link against a "*.lib", not a "*.dll"... tried this but it didn't work
+    #set_target_properties(OneDALNative_lib PROPERTIES LINKER_LANGUAGE C)
+
+    add_executable(OneDALNative program_nodal.cpp)
+    # Windows wants to link against a "*.lib", not a "*.dll"
+    #target_link_libraries(OneDALNative PUBLIC OneDALNative_lib)
+    target_link_libraries(OneDALNative OneDALNative_lib)
 endif()
