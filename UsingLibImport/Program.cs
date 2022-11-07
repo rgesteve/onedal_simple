@@ -9,7 +9,11 @@ namespace UsingLibImportGenerator
 {
     internal static partial class NativeLib
     {
+    #if WINDOWS
         public const string NativeLibLoc = @"C:\Users\perf\projects\onedal_simple\Native\build\Debug\OneDALNative_lib.dll";
+    #else
+        public const string NativeLibLoc = "/data/projects/onedal_simple/Native/build/libOneDALNative_lib.so";
+    #endif
 
 #if true
         [LibraryImport(NativeLibLoc, EntryPoint = "sumi")]
