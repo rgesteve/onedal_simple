@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "XgbLibimportConsole": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "PATH": "C:\\Users\\perf\\projects\\xgboost\\build_new\\install\\bin"
+      }
+    }
+  }
+}
