@@ -4,4 +4,5 @@
 Console.WriteLine("Hello, World!");
 var xgbversion = XGBoost.Version();
 Console.WriteLine($"testing library: {xgbversion.Major}, {xgbversion.Minor}...");
+Console.WriteLine($"with buildinfo: {XGBoost.BuildInfo()}...");
 Console.WriteLine("Done!");

@@ -8,7 +8,7 @@ using Microsoft.ML.Runtime;
 
 namespace XgbLibimport
 {
-#if false
+
 #pragma warning disable MSML_GeneralName
     public class XGBoostDLLException : Exception
 #pragma warning restore MSML_GeneralName
@@ -25,7 +25,6 @@ namespace XgbLibimport
         }
 
     }
-#endif
 
     public static class XGBoost
     {
@@ -47,5 +46,12 @@ namespace XgbLibimport
                 Patch = patch
             };
         }
+
+	public static string BuildInfo()
+	{
+	  // should probably check this doesn't return an error
+          WrappedXGBoostInterface.XGBuildInfo(out string result);
+	  return result;
+	}
     }
 }

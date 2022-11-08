@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 
 namespace XgbLibimport
 {
-#if false
     /// <summary>
     /// Wrapper of DMatrix object of XGBoost
     /// </summary>
@@ -101,5 +100,4 @@ namespace XgbLibimport
 
         }
     }
-#endif
 }

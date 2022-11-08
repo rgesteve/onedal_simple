@@ -20,23 +20,26 @@ namespace XgbLibimport
         [LibraryImport(DllName, EntryPoint="XGBoostVersion")]
         public static partial void XGBoostVersion(out int major, out int minor, out int patch);
 
-#if false
+        [LibraryImport(DllName, EntryPoint="XGBuildInfo", StringMarshalling = StringMarshalling.Utf8)]
+        public static partial int XGBuildInfo(out string result);
+
         #region Error API 
 
-        [DllImport(DllName)]
-        public static extern string XGBGetLastError();
+        [LibraryImport(DllName, EntryPoint="XGBGetLastError", StringMarshalling = StringMarshalling.Utf8)]
+        public static partial string XGBGetLastError();
 
         #endregion
 
         #region DMatrix API 
 
-        [DllImport(DllName)]
-        public static extern int XGDMatrixCreateFromMat(float[] data, ulong nrow, ulong ncol,
+	[LibraryImport(DllName, EntryPoint="XGDMatrixCreateFromMat")]
+        public static partial int XGDMatrixCreateFromMat(ReadOnlySpan<float> data, ulong nrow, ulong ncol,
                                                     float missing, out IntPtr handle);
 
-        [DllImport(DllName)]
-        public static extern int XGDMatrixFree(IntPtr handle);
+	[LibraryImport(DllName, EntryPoint="XGDMatrixFree")]
+        public static partial int XGDMatrixFree(IntPtr handle);
 
+#if false
         [DllImport(DllName)]
         public static extern int XGDMatrixNumRow(IntPtr handle, out ulong nrows);
 
@@ -50,9 +53,10 @@ namespace XgbLibimport
         [DllImport(DllName)]
         public static extern int XGDMatrixSetFloatInfo(IntPtr handle, string field,
                                                    IntPtr array, ulong len);
+#endif
         #endregion
 
-
+#if false
         #region API Booster
 
         [DllImport(DllName)]
