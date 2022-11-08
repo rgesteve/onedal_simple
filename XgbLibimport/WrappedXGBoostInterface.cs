@@ -20,8 +20,8 @@ namespace XgbLibimport
         [LibraryImport(DllName, EntryPoint="XGBoostVersion")]
         public static partial void XGBoostVersion(out int major, out int minor, out int patch);
 
-        [LibraryImport(DllName, EntryPoint="XGBuildInfo", StringMarshalling = StringMarshalling.Utf8)]
-        public static partial int XGBuildInfo(out string result);
+        [LibraryImport(DllName, EntryPoint="XGBuildInfo")]
+        public unsafe static partial int XGBuildInfo(byte** result);
 
         #region Error API 
 

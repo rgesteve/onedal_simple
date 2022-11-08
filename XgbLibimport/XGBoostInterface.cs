@@ -50,8 +50,12 @@ namespace XgbLibimport
 	public static string BuildInfo()
 	{
 	  // should probably check this doesn't return an error
-          WrappedXGBoostInterface.XGBuildInfo(out string result);
-	  return result;
+	  unsafe {
+	    byte* resultPtr;
+  	    WrappedXGBoostInterface.XGBuildInfo(&resultPtr);
+	    string result = new string((sbyte*)resultPtr);
+	    return result;
+	  }
 	}
     }
 }
