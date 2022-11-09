@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -47,13 +48,16 @@ namespace XgbLibimport
             };
         }
 
+	// TODO: Should probably return a dictionary by parsing the JSON output
 	public static string BuildInfo()
 	{
 	  // should probably check this doesn't return an error
 	  unsafe {
 	    byte* resultPtr;
   	    WrappedXGBoostInterface.XGBuildInfo(&resultPtr);
-	    string result = new string((sbyte*)resultPtr);
+	    // this uses ANSI on Windows and non-ANSI on other OSs, so use Marshal.PtrToStringUTF8 instead
+	    // string result = new string((sbyte*)resultPtr);
+	    string result = Marshal.PtrToStringUTF8((nint)resultPtr);
 	    return result;
 	  }
 	}
