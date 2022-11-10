@@ -18,7 +18,7 @@ namespace XgbLibimport
         /// </summary>
         public unsafe DMatrix(float[] data, uint nrows, uint ncols, float[]? labels = null)
         {
-	#if false
+
             int errp = WrappedXGBoostInterface.XGDMatrixCreateFromMat(data, nrows, ncols, Missing, out _handle);
             if (errp == -1)
             {
@@ -30,11 +30,8 @@ namespace XgbLibimport
             {
                 SetLabel(labels);
             }
-	#endif
-
         }
 
-#if false
         public ulong GetNumRows()
         {
             ulong numRows;
@@ -59,23 +56,54 @@ namespace XgbLibimport
             return numCols;
         }
 
+#if false
         public unsafe void SetLabel(float[] labels)
         {
 #if false
             Contracts.AssertValue(labels);
             Contracts.Assert(labels.Length == GetNumRows());
 #endif
+
             fixed (float* ptr = labels)
             {
+
                 int errp = WrappedXGBoostInterface.XGDMatrixSetFloatInfo(_handle, "label", (IntPtr)ptr, (ulong)labels.Length);
+                //int errp = WrappedXGBoostInterface.XGDMatrixSetFloatInfo(_handle, "label", labels, (ulong)labels.Length);
                 if (errp == -1)
                 {
                     string reason = WrappedXGBoostInterface.XGBGetLastError();
                     throw new XGBoostDLLException(reason);
                 }
             }
+
         }
-	#endif
+#else
+        public void SetLabel(float[] labels)
+        {
+#if false
+            Contracts.AssertValue(labels);
+            Contracts.Assert(labels.Length == GetNumRows());
+#endif
+
+            int errp = WrappedXGBoostInterface.XGDMatrixSetFloatInfo(_handle, "label", labels, (ulong)labels.Length);
+            if (errp == -1)
+            {
+              string reason = WrappedXGBoostInterface.XGBGetLastError();
+              throw new XGBoostDLLException(reason);
+            }
+        }
+#endif
+
+        public Span<float> GetLabels()
+        {
+          int errp = WrappedXGBoostInterface.XGDMatrixGetFloatInfo(_handle, "label", out ulong labellen, out Span<float> result);
+          if (errp == -1)
+          {
+            string reason = WrappedXGBoostInterface.XGBGetLastError();
+            throw new XGBoostDLLException(reason);
+          }
+	  return result;
+	}
 
         public void Dispose()
         {
