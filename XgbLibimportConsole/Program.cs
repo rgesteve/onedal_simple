@@ -1,4 +1,8 @@
 ﻿using XgbLibimport;
+using Microsoft.ML;
+using Microsoft.ML.Data;
+using Microsoft.ML.Runtime;
+using Microsoft.Data.Analysis;
 
 // See https://aka.ms/new-console-template for more information
 Console.WriteLine("Hello, World!");
@@ -24,11 +28,13 @@ Booster bst = new Booster(dmat);
 bst.SetParameter("objective", "reg:squarederror");
 
 Console.WriteLine("Starting training loop");
-int numBoostRound = 10;
+int numBoostRound = 1;
 for (int i = 0; i < numBoostRound; i++) {
     bst.Update(dmat, i);
 }
 
 bst.DumpModel();
+
+Console.WriteLine($"------- the booster configurtion is << {bst.DumpConfig()} >>");
 
 Console.WriteLine("Done!");

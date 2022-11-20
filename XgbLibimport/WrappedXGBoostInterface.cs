@@ -97,9 +97,13 @@ namespace XgbLibimport
         public static extern int XGBoosterDumpModel(IntPtr handle, string fmap, int with_stats, out int out_len, out IntPtr dumpStr);
 	#endif
 
+	[LibraryImport(DllName, EntryPoint="XGBoosterSaveJsonConfig", StringMarshalling = StringMarshalling.Utf8)]
+        public static unsafe partial int XGBoosterSaveJsonConfig(IntPtr handle, out ulong out_len, [MarshalUsing(CountElementName ="out_len")] byte** result);
+
 	[LibraryImport(DllName, EntryPoint="XGBoosterDumpModelEx", StringMarshalling = StringMarshalling.Utf8)]
         public static unsafe partial int XGBoosterDumpModelEx(IntPtr handle, string fmap, int with_stats, string format, out ulong out_len, out byte** result);
-        #endregion
+
+#endregion
 
     }
 

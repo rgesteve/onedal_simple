@@ -102,10 +102,25 @@ namespace XgbLibimport
 	    Console.WriteLine($"**** Got {attrs_len} attributes in booster.");
 	    var result = new string[attrs_len];
 	    for (ulong i = 0; i < attrs_len; ++i) {
-            	result[i] = Marshal.PtrToStringUTF8((nint)attrs[i]);
+            	result[i] = Marshal.PtrToStringUTF8((nint)attrs[i]) ?? "";
 	    }
     	    Console.WriteLine($"**** The length of the boosters are {result.Length}.");
        	    Console.WriteLine($"**** The first booster is {result[0]}.");
+
+	}
+
+	public unsafe string DumpConfig()
+	{	
+	    ulong config_len;
+	    byte* config_result;
+            var errp = WrappedXGBoostInterface.XGBoosterSaveJsonConfig(_handle, out config_len, &config_result);
+            if (errp == -1)
+            {
+                string reason = WrappedXGBoostInterface.XGBGetLastError();
+                throw new XGBoostDLLException(reason);
+            }
+	    string result = Marshal.PtrToStringUTF8((nint)config_result) ?? "";
+	    return result;
 
 	}
 

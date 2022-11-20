@@ -3,6 +3,8 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+
+using Microsoft.ML;
 #if false
 using Microsoft.ML.Runtime;
 #endif
@@ -61,5 +63,9 @@ namespace XgbLibimport
 	      return result;
             }
         }
+
+	public static void DMatrixFromDV(IDataView dv)
+	{
+	}
     }
 }
