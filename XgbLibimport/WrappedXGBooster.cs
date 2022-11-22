@@ -11,8 +11,10 @@ using System.Text;
 using Microsoft.ML.Runtime;
 
 using Microsoft.ML.Trainers.FastTree;
+#endif
 
 using Microsoft.ML;
+#if false
 using Microsoft.ML.CommandLine;
 using Microsoft.ML.Data;
 using Microsoft.ML.EntryPoints;
@@ -91,35 +93,50 @@ namespace XgbLibimport
 
 	public unsafe void DumpModel()
 	{	
-	    ulong attrs_len;
-	    byte** attrs;
-            var errp = WrappedXGBoostInterface.XGBoosterDumpModelEx(_handle, "", 0, "json", out attrs_len, out attrs);
+	    ulong boosters_len;
+	    byte** booster_raw_arr;
+            var errp = WrappedXGBoostInterface.XGBoosterDumpModelEx(_handle, "", 0, "json", out boosters_len, out booster_raw_arr);
             if (errp == -1)
             {
                 string reason = WrappedXGBoostInterface.XGBGetLastError();
                 throw new XGBoostDLLException(reason);
             }
-	    Console.WriteLine($"**** Got {attrs_len} attributes in booster.");
-	    var result = new string[attrs_len];
-	    for (ulong i = 0; i < attrs_len; ++i) {
-            	result[i] = Marshal.PtrToStringUTF8((nint)attrs[i]) ?? "";
+
+	    var result = new string[boosters_len];
+	    var boosterPattern = @"^booster\[\d+\]";
+
+	    for (ulong i = 0; i < boosters_len; ++i) {
+            	result[i] = Marshal.PtrToStringUTF8((nint)booster_raw_arr[i]) ?? "";
+		Console.WriteLine($"**** Trying to parse booster {i}, which is {result[i]}");
+ 		var doc = JsonDocument.Parse(result[i]);
+#if false
+                    TreeNode t = TreeNode.Create(doc.RootElement);
+                    ensemble.Add(t);
+#else
+                    //var table = new TablePopulator(doc);
+		    Console.WriteLine($"**** Booster {i} has an element of type: {doc.RootElement.ValueKind}.");
+#endif
 	    }
+
     	    Console.WriteLine($"**** The length of the boosters are {result.Length}.");
-       	    Console.WriteLine($"**** The first booster is {result[0]}.");
+       	    //Console.WriteLine($"**** The first booster is {result[0]}.");
 
 	}
 
-	public unsafe string DumpConfig()
+	public string DumpConfig()
 	{	
 	    ulong config_len;
-	    byte* config_result;
-            var errp = WrappedXGBoostInterface.XGBoosterSaveJsonConfig(_handle, out config_len, &config_result);
-            if (errp == -1)
-            {
-                string reason = WrappedXGBoostInterface.XGBGetLastError();
-                throw new XGBoostDLLException(reason);
-            }
-	    string result = Marshal.PtrToStringUTF8((nint)config_result) ?? "";
+	    string result = default;
+	    unsafe {
+    	      byte* config_result;
+              var errp = WrappedXGBoostInterface.XGBoosterSaveJsonConfig(_handle, out config_len, &config_result);
+              if (errp == -1)
+              {
+                  string reason = WrappedXGBoostInterface.XGBGetLastError();
+                  throw new XGBoostDLLException(reason);
+              }
+    	      result = Marshal.PtrToStringUTF8((nint)config_result) ?? "";
+	    }
 	    return result;
 
 	}
@@ -227,9 +244,9 @@ namespace XgbLibimport
             }
         }
 
-#if false
-        #region Create Models
 
+        #region Create Models
+#if false
         public string[] DumpModelEx(string fmap, int with_stats, string format)
         {
             int length;
@@ -283,10 +300,10 @@ namespace XgbLibimport
 
         private class TablePopulator
         {
-            public Dictionary<int, List<JsonElement>> dict = new();
-            public Dictionary<string, int> nodes = new();
-            public Dictionary<string, string> lte = new();
-            public Dictionary<string, string> gt = new();
+            public Dictionary<int, List<JsonElement>> dict = new(); // nodes in level (root is level 0)
+            public Dictionary<string, int> nodes = new(); // nodes-to-level
+            public Dictionary<string, string> lte = new(); // node-to-their-left-branch
+            public Dictionary<string, string> gt = new(); // node-to-their-right-branch
 
             public TablePopulator(JsonElement elm)
             {
@@ -336,8 +353,8 @@ namespace XgbLibimport
                 }
             }
         }
-        #endregion
 #endif
+        #endregion
 
         #region IDisposable Support
         public void Dispose()
