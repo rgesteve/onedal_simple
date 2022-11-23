@@ -12,4 +12,12 @@
     <PackageReference Include="Microsoft.ML" Version="2.0.0" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <!-- https://learn.microsoft.com/en-us/nuget/quickstart/create-and-publish-a-package-using-the-dotnet-cli -->
+    <TargetFramework>net7.0</TargetFramework>
+    <PackageId>XgbLibimport</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>rgesteve</Authors>
+  </PropertyGroup>
+
 </Project>
