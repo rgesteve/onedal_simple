@@ -247,6 +247,26 @@ namespace XgbLibimport
 
 
         #region Create Models
+
+	public class XGBNode
+	{
+	    public int nodeid { get; set; }
+	}
+
+	public class XGBNodeLeaf : XGBNode
+	{
+	    public float leaf { get; set; }
+	}
+
+	public class XGBNodeSplit : XGBNode
+	{
+	    public int depth { get; set; }
+	    public int split { get; set; }
+	    public float split_condition { get; set; }
+	    public int yes { get; set; }
+	    public int no { get; set; }
+	    public float missing { get; set; }
+	}
 #if false
         public string[] DumpModelEx(string fmap, int with_stats, string format)
         {
@@ -376,9 +396,11 @@ namespace XgbLibimport
         #endregion
     }
 
-    public static class Utils 
+    public static partial class Utils 
     {
-        public class DictionaryStringObjectConverter : JsonConverter< Dictionary<string, object> >
+	public const string Version = "version 0.0.1";
+
+	public class DictionaryStringObjectConverter : JsonConverter< Dictionary<string, object> >
         {
             public override void Write(Utf8JsonWriter writer, Dictionary<string, object> value, JsonSerializerOptions options)
             {
