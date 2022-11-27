@@ -476,4 +476,13 @@ namespace XgbLibimport
             }
         }
     }
+
+    public Dictionary<string, object> ParseBoosterConfig(string boosterConfig)
+    {
+        var options = new JsonSerializerOptions
+        {
+            Converters = { new Utils.DictionaryStringObjectConverter() }
+        };
+        return JsonSerializer.Deserialize<Dictionary<string, object>>(boosterConfig, options);
+    }
 }
