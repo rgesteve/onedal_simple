@@ -37,4 +37,9 @@ bst.DumpModel();
 
 Console.WriteLine($"------- the booster configurtion is << {bst.DumpConfig()} >>");
 
+var resopts = new XgbRegressionTrainerBase.Options();
+Console.WriteLine($"Stupid check of regression options: {resopts.EvaluationMetric}");
+var resoptsdict = resopts.ToDictionary();
+Console.WriteLine($"Regression options have: {resoptsdict.Count} elements.");
+
 Console.WriteLine("Done!");
