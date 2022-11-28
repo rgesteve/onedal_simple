@@ -107,9 +107,9 @@ namespace XgbLibimport
 
     }
 
-#if false
-    internal static class XGBoostInterfaceUtils
+    public static class XGBoostInterfaceUtils
     {
+#if false
         /// <summary>
         /// Checks if XGBoost has a pending error message. Raises an exception in that case.
         /// </summary>
@@ -137,6 +137,7 @@ namespace XgbLibimport
             }
             return preds;
         }
+#endif
 
         /// <summary>
         /// Helper function used for generating the LightGbm argument name.
@@ -163,14 +164,5 @@ namespace XgbLibimport
             }
             return strBuf.ToString();
         }
-
-        /// <summary>
-        /// Convert the pointer of c string to c# string.
-        /// </summary>
-        public static string GetString(IntPtr src)
-        {
-            return Marshal.PtrToStringAnsi(src);
-        }
     }
-#endif
 }

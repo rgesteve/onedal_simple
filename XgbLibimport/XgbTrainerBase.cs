@@ -11,6 +11,11 @@ using Microsoft.ML.Runtime;
 
 namespace XgbLibimport
 {
+    public static class Defaults
+    {
+        public const int NumberOfIterations = 100;
+    }
+
   public class XgbTrainerBase<TOptions>
     where TOptions : XgbTrainerBase<TOptions>.OptionBase {
 
@@ -20,6 +25,12 @@ namespace XgbLibimport
 
       [Argument(ArgumentType.AtMostOnce, HelpText = "Maximum number of bucket bin for features.", ShortName = "mb")]
       public int MaximumBinCountPerFeature = 255;
+
+      /// <summary>
+      /// The maximum number of leaves in one tree.
+      /// </summary>
+      [Argument(ArgumentType.AtMostOnce, HelpText = "Maximum leaves for trees.", SortOrder = 2, ShortName = "nl", NullName = "<Auto>")]
+      public int? NumberOfLeaves;
 
     private BoosterParameterBase.OptionsBase _boosterParameter;
     public IBoosterParameterFactory BoosterFactory = new GradientBooster.Options();
@@ -40,7 +51,7 @@ private protected static Dictionary<string, string> NameMapping = new Dictionary
 	    	       #if false
                {nameof(MinimumExampleCountPerLeaf),           "min_data_per_leaf"},
                {nameof(NumberOfLeaves),                       "num_leaves"},
-	       #endif
+	       	       	       #endif
                {nameof(MaximumBinCountPerFeature),            "max_bin" },
 	       #if false
                {nameof(MinimumExampleCountPerGroup),          "min_data_per_group" },
@@ -56,11 +67,7 @@ private protected static Dictionary<string, string> NameMapping = new Dictionary
     {
         if (NameMapping.ContainsKey(name))
             return NameMapping[name];
-#if false
-        return LightGbmInterfaceUtils.GetOptionName(name);
-#else
-	return "not_found";
-#endif
+        return XGBoostInterfaceUtils.GetOptionName(name);
     }
 
     public virtual Dictionary<string, object> ToDictionary()
@@ -69,7 +76,7 @@ private protected static Dictionary<string, string> NameMapping = new Dictionary
 
         var boosterParams = BoosterFactory.CreateComponent();
         boosterParams.UpdateParameters(res);
-        res["boosting_type"] = boosterParams.BoosterName;
+        res["booster"] = boosterParams.BoosterName;
 
 	#if false
         res["verbose"] = Silent ? "-1" : "1";
@@ -78,9 +85,8 @@ private protected static Dictionary<string, string> NameMapping = new Dictionary
 
         res["seed"] = (Seed.HasValue) ? Seed : host.Rand.Next();
 	#endif
-
+        res[GetOptionName(nameof(MaximumBinCountPerFeature))] = MaximumBinCountPerFeature;
 #if false
-                res[GetOptionName(nameof(MaximumBinCountPerFeature))] = MaximumBinCountPerFeature;
                 res[GetOptionName(nameof(HandleMissingValue))] = HandleMissingValue;
                 res[GetOptionName(nameof(UseZeroAsMissingValue))] = UseZeroAsMissingValue;
                 res[GetOptionName(nameof(MinimumExampleCountPerGroup))] = MinimumExampleCountPerGroup;

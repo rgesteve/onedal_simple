@@ -23,8 +23,8 @@ namespace XgbLibimport
     private protected static Dictionary<string, string> NameMapping = new Dictionary<string, string>()
     {
            {nameof(OptionsBase.MinimumSplitGain),               "min_split_gain" },
-	   /*
            {nameof(OptionsBase.MaximumTreeDepth),               "max_depth"},
+	   /*
            {nameof(OptionsBase.MinimumChildWeight),             "min_child_weight"},
            {nameof(OptionsBase.SubsampleFraction),              "subsample"},
            {nameof(OptionsBase.SubsampleFrequency),             "subsample_freq"},
@@ -39,6 +39,16 @@ namespace XgbLibimport
       [Argument(ArgumentType.AtMostOnce,
                 HelpText = "Minimum loss reduction required to make a further partition on a leaf node of the tree. the larger, the more conservative the algorithm will be.")]
       public double MinimumSplitGain = 0;
+
+      /// <summary>
+      /// The maximum depth of a tree.
+      /// </summary>
+      /// <value>
+      /// 0 means no limit.
+      /// </value>
+      [Argument(ArgumentType.AtMostOnce,
+          HelpText = "Maximum depth of a tree. 0 means no limit. However, tree still grows by best-first.")]
+      public int MaximumTreeDepth = 0;
 
       BoosterParameterBase IBoosterParameterFactory.CreateComponent() => BuildOptions();
       public abstract BoosterParameterBase BuildOptions();
@@ -58,15 +68,8 @@ namespace XgbLibimport
         var attribute = field.GetCustomAttribute<ArgumentAttribute>(false);
         if (attribute == null) continue;
 
-#if false
-        var name = NameMapping.ContainsKey(field.Name) ? NameMapping[field.Name] : LightGbmInterfaceUtils.GetOptionName(field.Name);
+        var name = NameMapping.ContainsKey(field.Name) ? NameMapping[field.Name] : XGBoostInterfaceUtils.GetOptionName(field.Name);
         res[name] = field.GetValue(BoosterOptions);
-#else
-        var name = NameMapping.ContainsKey(field.Name) ? NameMapping[field.Name] : "";
-	if (name != "") {
-          res[name] = field.GetValue(BoosterOptions);
-	}
-#endif
       }
     }
   }
@@ -92,6 +95,10 @@ namespace XgbLibimport
     public class Options : OptionsBase {
       [Argument(ArgumentType.AtMostOnce, HelpText = "The drop ratio for trees. Range:(0,1).")]
       public double RateDrop = 0.1;
+
+      [Argument(ArgumentType.AtMostOnce, HelpText = "The probability of dropping at least one tree.")]
+      public int OneDrop = 0;
+
       public override BoosterParameterBase BuildOptions() => new DartBooster(this);
     }
 

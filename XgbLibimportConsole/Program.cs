@@ -35,11 +35,23 @@ for (int i = 0; i < numBoostRound; i++) {
 
 bst.DumpModel();
 
-Console.WriteLine($"------- the booster configurtion is << {bst.DumpConfig()} >>");
+Console.WriteLine($"------- the booster configuration is << {bst.DumpConfig()} >>");
+
+Console.WriteLine($"------- Now looking at the options --------------");
 
 var resopts = new XgbRegressionTrainerBase.Options();
 Console.WriteLine($"Stupid check of regression options: {resopts.EvaluationMetric}");
 var resoptsdict = resopts.ToDictionary();
-Console.WriteLine($"Regression options have: {resoptsdict.Count} elements.");
+Console.WriteLine($"Regression options have: {resoptsdict.Count} elements: ");
+foreach (var kv in resoptsdict) {
+    Console.WriteLine($"Key: {kv.Key} has value: [{kv.Value}]");
+}
+
+var dartopts = new XgbRegressionTrainerBase.Options { Booster = new DartBooster.Options { MaximumTreeDepth = 6 } } ;
+var dartoptsdict = dartopts.ToDictionary();
+Console.WriteLine($"Regression options (now trying DART) has: {dartoptsdict.Count} elements: ");
+foreach (var kv in dartoptsdict) {
+    Console.WriteLine($"Key: {kv.Key} has value: [{kv.Value}]");
+}
 
 Console.WriteLine("Done!");
