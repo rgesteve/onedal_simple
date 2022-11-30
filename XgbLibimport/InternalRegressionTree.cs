@@ -166,6 +166,7 @@ namespace XgbLibimport
 
             return categoricalSplit;
         }
+#endif
 
         /// <summary>
         /// Create a Regression Tree object from raw tree contents.
@@ -174,14 +175,19 @@ namespace XgbLibimport
             float[] rawThresholds, float[] defaultValueForMissing, int[] lteChild, int[] gtChild, double[] leafValues,
             int[][] categoricalSplitFeatures, bool[] categoricalSplit)
         {
+#if false
             if (numLeaves <= 1)
             {
+#endif          
                 // Create a dummy tree.
                 InternalRegressionTree tree = new InternalRegressionTree(2);
-                tree.SetOutput(0, 0.0);
+#if false
+            tree.SetOutput(0, 0.0);
                 tree.SetOutput(1, 0.0);
+#endif                
                 return tree;
-            }
+#if false
+        }
             else
             {
                 Contracts.CheckParam(numLeaves - 1 == Utils.Size(splitFeatures), nameof(splitFeatures), "Size error, should equal to numLeaves - 1.");
@@ -195,8 +201,8 @@ namespace XgbLibimport
                 Contracts.CheckParam(numLeaves - 1 == Utils.Size(categoricalSplit), nameof(categoricalSplit), "Size error, should equal to numLeaves - 1.");
                 return new InternalRegressionTree(splitFeatures, splitGain, null, rawThresholds, defaultValueForMissing, lteChild, gtChild, leafValues, categoricalSplitFeatures, categoricalSplit);
             }
-        }
 #endif
+        }
 
         internal InternalRegressionTree(int[] splitFeatures, double[] splitGain, double[] gainPValue,
             float[] rawThresholds, float[] defaultValueForMissing, int[] lteChild, int[] gtChild, double[] leafValues,
@@ -867,10 +873,10 @@ namespace XgbLibimport
 
         private int GetLeafCore(ReadOnlySpan<float> nonBinnedInstance, List<int> path = null, int root = 0)
         {
-	#if false
+#if false
             Contracts.Assert(path == null || path.Count == 0);
             Contracts.Assert(root >= 0);
-	#endif
+#endif
 
             // Check for an empty tree.
             if (NumLeaves == 1)
