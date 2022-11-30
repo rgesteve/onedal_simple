@@ -109,13 +109,16 @@ namespace XgbLibimport
 	    for (ulong i = 0; i < boosters_len; ++i) {
             	result[i] = Marshal.PtrToStringUTF8((nint)booster_raw_arr[i]) ?? "";
 		Console.WriteLine($"**** Trying to parse booster {i}, which is {result[i]}");
- 		var doc = JsonDocument.Parse(result[i]);
 #if false
-                    TreeNode t = TreeNode.Create(doc.RootElement);
-                    ensemble.Add(t);
+ 		var doc = JsonDocument.Parse(result[i]);
+                TreeNode t = TreeNode.Create(doc.RootElement);
+                ensemble.Add(t);
 #else
-                    //var table = new TablePopulator(doc);
-		    Console.WriteLine($"**** Booster {i} has an element of type: {doc.RootElement.ValueKind}.");
+		Console.WriteLine($"**** Calling the TablePopulator on booster {i}..");
+                var table = new TablePopulator(result[i]);
+		var arrs = table.Sequentialize();
+		//Console.WriteLine($"**** Booster {i} has an element of type: {doc.RootElement.ValueKind}.");
+		Console.WriteLine($"**** I coud get {arrs.Item1.Length} arrays from Booster {i}.");
 #endif
 	    }
 
@@ -267,6 +270,128 @@ namespace XgbLibimport
 	    public int no { get; set; }
 	    public float missing { get; set; }
 	}
+
+class TablePopulator
+        {
+            public Dictionary<int, XGBNodeLeaf> leaves = new();
+            public Dictionary<int, XGBNodeSplit> decisions = new();
+            
+            public TablePopulator(string jsonFragment)
+            {
+                PopulateTable(JsonDocument.Parse(jsonFragment).RootElement);
+            }
+
+            public void PopulateTable(JsonElement elm)
+            {
+                int nodeId = default;
+                if (elm.TryGetProperty("nodeid", out JsonElement nodeidElm))
+                {
+                    // If this test fails, should probably bail, as the syntax of the booster is incorrect
+                    nodeId = nodeidElm.GetInt32();
+                }
+
+                if (elm.TryGetProperty("leaf", out JsonElement leafJsonNode))
+                {
+                    leaves.Add(nodeId, new XGBNodeLeaf { nodeid = nodeId, leaf = leafJsonNode.GetSingle() });
+                }
+                else if (elm.TryGetProperty("children", out JsonElement internalJsonNode))
+                {
+                    var node = new XGBNodeSplit { nodeid = nodeId };
+                    decisions.Add(nodeId, node);
+                    if (elm.TryGetProperty("yes", out JsonElement yesNodeId))
+                    {
+                        node.yes = yesNodeId.GetInt32();
+                    }
+
+                    if (elm.TryGetProperty("no", out JsonElement noNodeId))
+                    {
+                        node.no = noNodeId.GetInt32();
+                    }
+                                        
+                    // TODO: missing "missing"
+                    if (elm.TryGetProperty("split", out JsonElement splitFeature))
+                    {
+                        var candidate = splitFeature.GetString();
+                        if (Regex.IsMatch(candidate, "f[0-9]+")) {
+                            if (int.TryParse(candidate.Substring(1), out int splitFeatureIndex)) {                            
+                                node.split = splitFeatureIndex;
+                            }
+                        }
+                    }
+                    
+                    if (elm.TryGetProperty("split_condition", out JsonElement splitThreshold))
+                    {
+                        node.split_condition = splitThreshold.GetSingle();
+                    }
+                    
+
+                    foreach (var e in internalJsonNode.EnumerateArray())
+                    {
+                        PopulateTable(e);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Invalid booster content");
+                }
+            }
+
+	    // TODO: Maybe this should return an InternalRegressionTree
+            public (int[], int[]) Sequentialize()
+            {
+                int nextNode = 0;
+                int nextLeaf = 1;
+                Dictionary<int, int> mapNodes = new(); // internal nodes original id-to-seq id
+                Dictionary<int, int> mapLeaves = new(); // leaves original id-to-seq-id map
+                
+                foreach(var n in decisions) {
+                  if (!mapNodes.ContainsKey(n.Key)) {
+                      mapNodes.Add(n.Key, nextNode++);
+                  }                  
+                }
+                foreach(var n in leaves) {
+                  if (!mapLeaves.ContainsKey(n.Key)) {
+                      mapLeaves.Add(n.Key, nextLeaf++);
+                  }                  
+                }
+                
+                int[] lte = new int[mapNodes.Count];
+                int[] gt = new int[mapNodes.Count];
+                
+                foreach(var n in decisions) {
+                  if (leaves.ContainsKey(n.Value.yes)) {
+                    lte [ mapNodes[n.Key] ] = -mapLeaves[n.Value.yes];
+                  } else {
+                    lte [ mapNodes[n.Key] ] = mapNodes[n.Value.yes];
+                  }
+                  
+                  if (leaves.ContainsKey(n.Value.no)) {
+                    gt [ mapNodes[n.Key] ] = -mapLeaves[n.Value.no];
+                  } else {
+                    gt [ mapNodes[n.Key] ] = mapNodes[n.Value.no];
+                  }                               
+                }
+
+#if false
+		var tree = new InternalRegressionTree.Create(leaves.Count,
+		new int[1] //, // int[] splitFeatures
+#if false
+		null, // double[] splitGain
+		null, // float[] rawThresholds
+		null, // float[] defaultValueForMissing
+		lte, // int[] lteChild
+		gt, // int[] gtChild
+		null, // double[] leafValues
+		null, // int[][] categoricalSplitFeatures
+		null // bool[] categoricalSplit
+#endif
+		);
+#endif
+
+                return (lte, gt);
+            }
+        }
+
 #if false
         public string[] DumpModelEx(string fmap, int with_stats, string format)
         {
