@@ -4,8 +4,7 @@ using Microsoft.ML.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.Data.Analysis;
 
-// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+Console.WriteLine("Starting process!");
 var xgbversion = XGBoost.Version();
 Console.WriteLine($"testing library: {xgbversion.Major}, {xgbversion.Minor}...");
 Console.WriteLine($"with buildinfo: {XGBoost.BuildInfo()}...");
@@ -32,6 +31,9 @@ int numBoostRound = 1;
 for (int i = 0; i < numBoostRound; i++) {
     bst.Update(dmat, i);
 }
+
+
+Console.WriteLine($"------- Dumping the model into an internal regression tree ---------------");
 
 bst.DumpModel();
 

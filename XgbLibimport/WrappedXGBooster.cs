@@ -109,13 +109,16 @@ namespace XgbLibimport
 	    for (ulong i = 0; i < boosters_len; ++i) {
             	result[i] = Marshal.PtrToStringUTF8((nint)booster_raw_arr[i]) ?? "";
 		Console.WriteLine($"**** Trying to parse booster {i}, which is {result[i]}");
- 		var doc = JsonDocument.Parse(result[i]);
 #if false
-                    TreeNode t = TreeNode.Create(doc.RootElement);
-                    ensemble.Add(t);
+ 		var doc = JsonDocument.Parse(result[i]);
+                TreeNode t = TreeNode.Create(doc.RootElement);
+                ensemble.Add(t);
 #else
-                    //var table = new TablePopulator(doc);
-		    Console.WriteLine($"**** Booster {i} has an element of type: {doc.RootElement.ValueKind}.");
+		Console.WriteLine($"**** Calling the TablePopulator on booster {i}..");
+                var table = new TablePopulator(result[i]);
+		var arrs = table.Sequentialize();
+		//Console.WriteLine($"**** Booster {i} has an element of type: {doc.RootElement.ValueKind}.");
+		Console.WriteLine($"**** I coud get {arrs.Item1.Length} arrays from Booster {i}.");
 #endif
 	    }
 
@@ -332,7 +335,8 @@ class TablePopulator
                     throw new Exception("Invalid booster content");
                 }
             }
-            
+
+	    // TODO: Maybe this should return an InternalRegressionTree
             public (int[], int[]) Sequentialize()
             {
                 int nextNode = 0;
@@ -367,7 +371,23 @@ class TablePopulator
                     gt [ mapNodes[n.Key] ] = mapNodes[n.Value.no];
                   }                               
                 }
-                
+
+#if false
+		var tree = new InternalRegressionTree.Create(leaves.Count,
+		new int[1] //, // int[] splitFeatures
+#if false
+		null, // double[] splitGain
+		null, // float[] rawThresholds
+		null, // float[] defaultValueForMissing
+		lte, // int[] lteChild
+		gt, // int[] gtChild
+		null, // double[] leafValues
+		null, // int[][] categoricalSplitFeatures
+		null // bool[] categoricalSplit
+#endif
+		);
+#endif
+
                 return (lte, gt);
             }
         }
