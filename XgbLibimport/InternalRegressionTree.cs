@@ -171,20 +171,26 @@ namespace XgbLibimport
         /// <summary>
         /// Create a Regression Tree object from raw tree contents.
         /// </summary>
-        public static InternalRegressionTree Create(int numLeaves, int[] splitFeatures, double[] splitGain,
+        public static InternalRegressionTree Create(
+            int numLeaves
+            , int[] splitFeatures
+//#if false
+            , double[] splitGain,
             float[] rawThresholds, float[] defaultValueForMissing, int[] lteChild, int[] gtChild, double[] leafValues,
-            int[][] categoricalSplitFeatures, bool[] categoricalSplit)
+            int[][] categoricalSplitFeatures, bool[] categoricalSplit
+//#endif
+            )
         {
 #if false
             if (numLeaves <= 1)
             {
-#endif          
-                // Create a dummy tree.
-                InternalRegressionTree tree = new InternalRegressionTree(2);
-#if false
+#endif
+            // Create a dummy tree.
+            InternalRegressionTree tree = new InternalRegressionTree(2);
+//#if false
             tree.SetOutput(0, 0.0);
                 tree.SetOutput(1, 0.0);
-#endif                
+//#endif
                 return tree;
 #if false
         }
@@ -757,12 +763,12 @@ namespace XgbLibimport
             return LeafValues[leaf];
         }
 
-#if false
 	public void SetOutput(int leaf, double value)
         {
             LeafValues[leaf] = value;
         }
 
+#if false
         // Returns index to a leaf a document belongs to
         // For empty tree returns 0
         public int GetLeaf(Dataset.RowForwardIndexer.Row featureBins)

@@ -372,10 +372,8 @@ class TablePopulator
                   }                               
                 }
 
-#if false
-		var tree = new InternalRegressionTree.Create(leaves.Count,
-		new int[1] //, // int[] splitFeatures
-#if false
+		var tree = InternalRegressionTree.Create(leaves.Count,
+		null, // int[] splitFeatures
 		null, // double[] splitGain
 		null, // float[] rawThresholds
 		null, // float[] defaultValueForMissing
@@ -384,9 +382,7 @@ class TablePopulator
 		null, // double[] leafValues
 		null, // int[][] categoricalSplitFeatures
 		null // bool[] categoricalSplit
-#endif
-		);
-#endif
+        );
 
                 return (lte, gt);
             }
