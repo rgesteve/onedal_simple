@@ -210,7 +210,7 @@ namespace XgbLibimport
 #endif
         }
 
-        internal InternalRegressionTree(int[] splitFeatures, double[] splitGain, double[] gainPValue,
+        public InternalRegressionTree(int[] splitFeatures, double[] splitGain, double[] gainPValue,
             float[] rawThresholds, float[] defaultValueForMissing, int[] lteChild, int[] gtChild, double[] leafValues,
             int[][] categoricalSplitFeatures, bool[] categoricalSplit)
             : this()

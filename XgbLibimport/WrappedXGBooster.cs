@@ -359,6 +359,7 @@ class TablePopulator
                 int[] gt = new int[mapNodes.Count];
                 int[] splitFeatures = new int[mapNodes.Count];
                 float[] rawThresholds = new float[mapNodes.Count];
+		double[] leafValues = new double[mapLeaves.Count + 1];
 
 		// TODO: Can this be done with LINQ in a better way?
                 foreach(var n in decisions) {
@@ -378,9 +379,14 @@ class TablePopulator
 		  // TODO: The rest
                 }
 
+		foreach(var l in leaves) {
+		  leafValues [ mapLeaves[l.Key] ] = l.Value.leaf;
+		}
+
 		Console.WriteLine($"----------------- running constraints -------------------");
 		Console.WriteLine($"Number of leaves: {leaves.Count}.");
-		Console.WriteLine($"Size of lte: [{lte.Length}] ");		
+		Console.WriteLine($"Size of lte: [{lte.Length}] ");
+		Console.WriteLine($"LTE: [{lte}] ");		
 		Console.WriteLine($"Size of gt: [{gt.Length}]");
 		
 		var tree = InternalRegressionTree.Create(leaves.Count,

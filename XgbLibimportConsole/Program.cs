@@ -56,4 +56,21 @@ foreach (var kv in dartoptsdict) {
     Console.WriteLine($"Key: {kv.Key} has value: [{kv.Value}]");
 }
 
+Console.WriteLine("Testing constructor of tree");
+
+{
+      int[] Lte = new int[] { -1 };
+      int[] Gt = new int[] { -2 };
+      int[] splitFeatures = new int[] { 0 };
+      float[] rawThresholds = new float[] { (float)0.5 };
+      float[] defaultValueForMissing = new float[] { 0 };
+      double[] leafValues = new double[] { 0.0, 0.1, 1.3 };
+
+      var tree = new InternalRegressionTree(splitFeatures, null, null, rawThresholds, defaultValueForMissing, Lte, Gt, leafValues, null, null);
+      var x = new VBuffer<float>(1, new float[] { (float)0.0});
+    }
+
+Console.WriteLine("----------------------");
+
+
 Console.WriteLine("Done!");
