@@ -313,8 +313,8 @@ class TablePopulator
                     {
                         var candidate = splitFeature.GetString();
                         if (Regex.IsMatch(candidate, "f[0-9]+")) {
-                            if (int.TryParse(candidate.Substring(1), out int splitFeatureIndex)) {                            
-                                node.split = splitFeatureIndex;
+                            if (int.TryParse(candidate.Substring(1), out int splitFeatureIndex)) {
+                              node.split = splitFeatureIndex;
                             }
                         }
                     }
@@ -357,7 +357,10 @@ class TablePopulator
                 
                 int[] lte = new int[mapNodes.Count];
                 int[] gt = new int[mapNodes.Count];
-                
+                int[] splitFeatures = new int[mapNodes.Count];
+                float[] rawThresholds = new float[mapNodes.Count];
+
+		// TODO: Can this be done with LINQ in a better way?
                 foreach(var n in decisions) {
                   if (leaves.ContainsKey(n.Value.yes)) {
                     lte [ mapNodes[n.Key] ] = -mapLeaves[n.Value.yes];
@@ -369,16 +372,24 @@ class TablePopulator
                     gt [ mapNodes[n.Key] ] = -mapLeaves[n.Value.no];
                   } else {
                     gt [ mapNodes[n.Key] ] = mapNodes[n.Value.no];
-                  }                               
+                  }
+		  splitFeatures[ mapNodes[n.Key] ] = n.Value.split;
+  		  rawThresholds[ mapNodes[n.Key] ] = n.Value.split_condition;
+		  // TODO: The rest
                 }
 
+		Console.WriteLine($"----------------- running constraints -------------------");
+		Console.WriteLine($"Number of leaves: {leaves.Count}.");
+		Console.WriteLine($"Size of lte: [{lte.Length}] ");		
+		Console.WriteLine($"Size of gt: [{gt.Length}]");
+		
 		var tree = InternalRegressionTree.Create(leaves.Count,
-		null, // int[] splitFeatures
+		splitFeatures,
 		null, // double[] splitGain
-		null, // float[] rawThresholds
+		rawThresholds,
 		null, // float[] defaultValueForMissing
-		lte, // int[] lteChild
-		gt, // int[] gtChild
+		lte,
+		gt,
 		null, // double[] leafValues
 		null, // int[][] categoricalSplitFeatures
 		null // bool[] categoricalSplit
