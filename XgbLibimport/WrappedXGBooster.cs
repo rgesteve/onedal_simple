@@ -359,7 +359,7 @@ class TablePopulator
                 int[] gt = new int[mapNodes.Count];
                 int[] splitFeatures = new int[mapNodes.Count];
                 float[] rawThresholds = new float[mapNodes.Count];
-		double[] leafValues = new double[mapLeaves.Count + 1];
+		double[] leafValues = new double[mapLeaves.Count];
 
 		// TODO: Can this be done with LINQ in a better way?
                 foreach(var n in decisions) {
@@ -380,7 +380,7 @@ class TablePopulator
                 }
 
 		foreach(var l in leaves) {
-		  leafValues [ mapLeaves[l.Key] ] = l.Value.leaf;
+		  leafValues [ mapLeaves[l.Key] - 1 ] = l.Value.leaf;
 		}
 
 		Console.WriteLine($"----------------- running constraints -------------------");

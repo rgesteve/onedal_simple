@@ -654,7 +654,6 @@ namespace XgbLibimport
         /// </summary>
         public double Weight { get; set; }
 
-#if false
         /// <summary>
         /// Retrieve the less-than-threshold child node of the specified parent node.
         /// </summary>
@@ -723,6 +722,7 @@ namespace XgbLibimport
             LeafValues[leafIndex] += delta;
         }
 
+#if false
         /// <summary>
         /// Evaluates the regression tree on a given document.
         /// </summary>
